@@ -1,4 +1,4 @@
-# Custom improvement of the offial HA integration for Denon HEOS
+# Norwegian Tide
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs) ![Maintenance](https://img.shields.io/maintenance/yes/2021.svg)
 
@@ -9,21 +9,28 @@
 ### NB!: This is a Beta version!
 {% endif %}
 
+This is a Home Assistant custom integration for Norwegian Tide which is interfacing an open API by the [Norwegian Mapping Authority (Kartverket)](https://kartverket.no/en/), more precisely [sehavniva.no](http://www.sehavniva.no/) which provides information about water levels and tidal predicitions and forecasts. **All data is ©Kartverket**.
 
-The official integration for [Denon HEOS](https://www.home-assistant.io/integrations/heos/) in [Home Assistant](https://www.home-assistant.io/) unfortunately lacks the grouping feature. Work is ongoing to add such features to the official integration, but due to some architectual discussions and the time it takes to conclude those, this custom integration allows HEOS-users to start grouping already today. Once this is implemented in the official integration, this custom integration will probably cease to exist. Follow the progress on official work (by others) [here](https://github.com/home-assistant/architecture/issues/364) and [here](https://github.com/home-assistant/core/pull/32568).
-
-The grouping feature is available as service calls **join** and **unjoin** but for the best user experience I recommend using the amazing [mini-media-card](https://github.com/kalkih/mini-media-player) which has the grouping feature working from UI/Lovelace.
-
-**DISCLAIMER:** I am *not* the codeowner of the official HEOS integration and do not take credit for anything else but adding a grouping-hack while waiting for official support of the feature. Credits for the hard work belongs to [Andrew Sayre](https://github.com/andrewsayre) who is the author of both the [official integration](https://www.home-assistant.io/integrations/heos/) and the [PyHeos library](https://github.com/andrewsayre/pyheos).
-
+Unfortunately the service only provides data for geographical positions in Norway - this is a limitation in the API and not in this integration.
 
 
 ## Configuration
 Configuration is done through UI/Lovelace. In Home Assistant, click on Configuration > Integrations where you add it with the + icon.
 
+You will be asked to give your location a name and to provide latitude and longitude as geographical position for the location you want to track. Finally select which sensors you would like the integration to add. More detailed description of this will be added, but in short there is one main sensor which contains most info and for most people probably will be sufficient. You do not need to add the other sensor unless you want, but several detailed sensors are available if you decide to add them.
+
+It is also possible to enable more than one location by adding the integration several times.
+
 ## Usage
-This custom integration should work the same way as the [official integration](https://www.home-assistant.io/integrations/heos/) but has added a grouping feature to enable you to group you speakers - just like you can do it in the HEOS app on you mobile or tablet.
+I strongly suggest to take a look at the [Apexchart-card] (https://github.com/RomRider/apexcharts-card) by Romrider - it is an excellent graph card for lovelace which also enables the possibility to show future values. This is necessary to display prediction- and forecast values.
 
-Either use the service calls **join** and **unjoin**, and be sure to check out the amazing [mini-media-card](https://github.com/kalkih/mini-media-player) which has the grouping feature working from UI/Lovelace. With that card you can control grouping easily from your UI.
+More detailed description will follow, but worth mentioning:
+ - Prediction: A calculated prediction for the location
+ - Forecast: Includes the weather effect on top of the prediction
+ - Observation: The observed value on the closest station to your location
 
-For further information, see [README](https://github.com/tmjo/heos_custom)
+
+## Issues and development
+Please report issues on github. If you would like to contribute to development, please do so through PRs.
+
+For further information, see [README](https://github.com/tmjo/ha-norwegiantide)

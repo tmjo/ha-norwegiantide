@@ -9,7 +9,7 @@ from homeassistant.const import (
 NAME = "Norwegian Tide"
 DOMAIN = "norwegiantide"
 DOMAIN_DATA = f"{DOMAIN}_data"
-VERSION = "0.0.5"
+VERSION = "2021.3.1"
 ATTRIBUTION = "Data from ©Kartverket (www.kartverket.no)"
 MANUFACTURER = "kartverket.no"
 ISSUE_URL = "https://github.com/custom-components/NorwegianTide/issues"
@@ -60,7 +60,7 @@ ENTITIES = {
             "ebbing",
             "flowing",
             "tide_state",
-            "tide_state_full",
+            # "tide_state_full",
             "next_tide",
             "next_tide_low",
             "next_tide_high",
@@ -198,19 +198,19 @@ ENTITIES = {
         "device_class": "tide_state",
         "icon": "mdi:wave",
     },
-    "tide_state_full": {
-        "type": "sensor",
-        "key": "tide_state_full",
-        "attrs": [
-            "next_tide_time",
-            # "time_to_next_high",
-            # "time_to_next_low"
-        ],
-        "units": None,
-        "convert_units_func": None,
-        "device_class": "tide_state_full",
-        "icon": "mdi:wave",
-    },
+    # "tide_state_full": {
+    #     "type": "sensor",
+    #     "key": "tide_state_full",
+    #     "attrs": [
+    #         "next_tide_time",
+    #         # "time_to_next_high",
+    #         # "time_to_next_low"
+    #     ],
+    #     "units": None,
+    #     "convert_units_func": None,
+    #     "device_class": "tide_state_full",
+    #     "icon": "mdi:wave",
+    # },
     "prediction": {
         "type": "sensor",
         "key": "currentdata.prediction",

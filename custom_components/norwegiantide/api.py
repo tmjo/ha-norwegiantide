@@ -12,7 +12,7 @@ from homeassistant.util import dt
 from decimal import Decimal
 from .const import TIDE_EBB, TIDE_FLOW
 
-TIMEOUT = 30    #seconds
+TIMEOUT = 30  # seconds
 API_PREDICTION = "prediction"
 API_OBSERVATION = "observation"
 API_FORECAST = "forecast"
@@ -126,8 +126,9 @@ class NorwegianTideApiClient:
             "ebb_flow": self.ebb_flow,
             "ebbing": self.ebb_flow == TIDE_EBB,
             "flowing": self.ebb_flow == TIDE_FLOW,
-            "tide_state": self.tide_state,
-            "tide_state_full": self.tide_state_full,
+            "tide_state": self.tide_state_full,
+            # "tide_state": self.tide_state,
+            # "tide_state_full": self.tide_state_full,
             "highlow": self.highlow,
             "tidedatatime": self.tidedatatime,
             "tidedata": self.tidedata,
