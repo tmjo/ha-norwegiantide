@@ -1,0 +1,13 @@
+{
+  "domain": "norwegiantide",
+  "name": "Norwegian Tide",
+  "version": "2021.2.1",
+  "documentation": "https://github.com/custom-components/NorwegianTide",
+  "issue_tracker": "https://github.com/custom-components/NorwegianTide/issues",
+  "dependencies": [],
+  "config_flow": true,
+  "codeowners": [
+    "@tmjo"
+  ],
+  "requirements": []
+}

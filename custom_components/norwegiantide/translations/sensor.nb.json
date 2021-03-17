@@ -1,0 +1,20 @@
+{
+    "state": {
+        "ebb_flow": {
+            "ebb": "Fjærer",
+            "flow": "Flør"
+        },
+        "tide_state": {
+            "low": "Lavvann",
+            "high": "Høyvann"
+        },
+        "tide_state_full": {
+            "high ebb": "Høyvann, fjærer",
+            "ebb": "Fjærer",
+            "low ebb": "Lavvann, fjærer",
+            "low flow": "Lavvann, flør",
+            "flow": "Flør",
+            "high flow": "Høyvann, flør"
+        }
+    }
+}

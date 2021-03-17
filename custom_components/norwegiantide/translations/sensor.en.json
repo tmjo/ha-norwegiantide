@@ -1,0 +1,20 @@
+{
+    "state": {
+        "ebb_flow": {
+            "ebb": "Ebbing",
+            "flow": "Flowing"
+        },
+        "tide_state": {
+            "low": "Low",
+            "high": "High"
+        },
+        "tide_state_full": {
+            "high ebb": "High, ebbing",
+            "ebb": "Ebbing",
+            "low ebb": "Low, ebbing",
+            "low flow": "Low, flowing",
+            "flow": "Flowing",
+            "high flow": "High, flowing"
+        }
+    }
+}

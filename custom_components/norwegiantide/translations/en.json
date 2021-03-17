@@ -1,0 +1,40 @@
+{
+    "config": {
+        "title": "NorwegianTide",
+        "step": {
+            "user": {
+                "title": "NorwegianTide",
+                "description": "If you need help with the configuration have a look here: https://github.com/custom-components/NorwegianTide",
+                "data": {
+                    "place": "Location name",
+                    "latitude": "Latitude",
+                    "longitude": "Longitude"
+                }
+            }
+        },
+        "error": {
+            "auth": "Latitude/longitude is wrong or outside coverage."
+        },
+        "abort": {
+            "single_instance_allowed": "Only a single configuration of NorwegianTide is allowed."
+        }
+    },
+    "options": {
+        "step": {
+            "user": {
+                "data": {
+                    "binary_sensor": "Binary sensor enabled",
+                    "sensor": "Sensor enabled",
+                    "switch": "Switch enabled"
+                }
+            },
+            "init": {
+                "title": "NorwegianTide",
+                "description": "Select options",
+                "data": {
+                  "monitored_conditions": "Monitored entities"
+                }
+              }
+        }
+    }
+}

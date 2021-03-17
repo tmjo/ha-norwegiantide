@@ -1,0 +1,5 @@
+{
+  "name": "Norwegian Tide",
+  "domains": ["sensor", "binary_sensor"],
+  "homeassistant": "2021.1.1",
+}
