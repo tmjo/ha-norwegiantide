@@ -1,0 +1,40 @@
+type: 'custom:apexcharts-card'
+graph_span: 36h
+span:
+  offset: +24h
+now:
+  show: true
+  label: Now
+header:
+  show: true
+  title: Tidewater
+  show_states: true
+series:
+  - entity: sensor.mylocation_tide_main
+    name: Prediction
+    show:
+      extremas: time
+      in_header: before_now
+      legend_value: false
+    data_generator: |
+      return entity.attributes.data.map((entry) => {
+        return [new Date(entry.datetime).getTime(), entry.prediction];
+      });
+  - entity: sensor.mylocation_tide_main
+    name: Forecast
+    show:
+      in_header: before_now
+      legend_value: false
+    data_generator: |
+      return entity.attributes.data.map((entry) => {
+        return [new Date(entry.datetime).getTime(), entry.forecast];
+      });
+  - entity: sensor.mylocation_tide_main
+    name: Observation
+    show:
+      in_header: before_now
+      legend_value: false
+    data_generator: |
+      return entity.attributes.data.map((entry) => {
+        return [new Date(entry.datetime).getTime(), entry.observation];
+      });

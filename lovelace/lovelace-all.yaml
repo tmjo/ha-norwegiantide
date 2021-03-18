@@ -1,0 +1,86 @@
+type: vertical-stack
+cards:
+  - type: glance
+    entities:
+      - entity: sensor.mylocation_ebb_flow
+      - entity: sensor.mylocation_tide_state
+      - entity: binary_sensor.mylocation_ebbing
+      - entity: binary_sensor.mylocation_flowing
+    show_name: false
+  - type: 'custom:apexcharts-card'
+    graph_span: 36h
+    span:
+      offset: +24h
+    now:
+      show: true
+      label: Now
+    header:
+      show: true
+      title: Tidewater
+      show_states: true
+    series:
+      - entity: sensor.mylocation_tide_main
+        name: Prediction
+        show:
+          extremas: time
+          in_header: before_now
+          legend_value: false
+        data_generator: |
+          return entity.attributes.data.map((entry) => {
+            return [new Date(entry.datetime).getTime(), entry.prediction];
+          });
+      - entity: sensor.mylocation_tide_main
+        name: Forecast
+        show:
+          in_header: before_now
+          legend_value: false
+        data_generator: |
+          return entity.attributes.data.map((entry) => {
+            return [new Date(entry.datetime).getTime(), entry.forecast];
+          });
+      - entity: sensor.mylocation_tide_main
+        name: Observation
+        show:
+          in_header: before_now
+          legend_value: false
+        data_generator: |
+          return entity.attributes.data.map((entry) => {
+            return [new Date(entry.datetime).getTime(), entry.observation];
+          });
+  - type: entities
+    entities:
+      - entity: sensor.mylocation_tide_main
+      - entity: sensor.mylocation_next_tide
+      - entity: sensor.mylocation_time_to_next_tide
+      - entity: sensor.mylocation_next_tide_high
+      - entity: sensor.mylocation_time_to_next_high
+      - entity: sensor.mylocation_next_tide_low
+      - entity: sensor.mylocation_time_to_next_low
+  - type: history-graph
+    entities:
+      - entity: sensor.mylocation_ebb_flow
+      - entity: sensor.mylocation_tide_state
+    hours_to_show: 24
+    refresh_interval: 0
+  - type: horizontal-stack
+    cards:
+      - type: conditional
+        conditions:
+          - entity: binary_sensor.mylocation_ebbing
+            state: 'on'
+        card:
+          type: glance
+          entities:
+            - entity: binary_sensor.mylocation_ebbing
+          show_name: false
+          show_state: false
+      - type: conditional
+        conditions:
+          - entity: binary_sensor.mylocation_flowing
+            state: 'on'
+        card:
+          type: glance
+          entities:
+            - entity: binary_sensor.mylocation_flowing
+          show_name: false
+          show_state: false
