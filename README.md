@@ -64,3 +64,12 @@ The main sensor will keep the current forecast value as state and will contain a
 
 ## Issues and development
 Please report issues on github. If you would like to contribute to development, please do so through PRs.
+
+## License
+MIT © [Tor Magne Johannessen][tmjo]
+
+<!-- Badges -->
+[hacs-url]: https://github.com/custom-components/hacs
+[hacs-image]: https://img.shields.io/badge/HACS-Custom-orange.svg
+[buymeacoffee-url]: https://www.buymeacoffee.com/tmjo
+[buymeacoffee-image]: https://img.shields.io/badge/support-buymeacoffee-222222.svg?style=flat-square
