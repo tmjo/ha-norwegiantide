@@ -72,7 +72,7 @@ ENTITIES = {
         "icon": "mdi:wave",
         "state_func": None,
     },
-    "ebbing": {
+    "tide_ebbing": {
         "type": "binary_sensor",
         "key": "ebb_flow",
         "attrs": [
@@ -86,7 +86,7 @@ ENTITIES = {
         "icon": "mdi:arrow-expand-down",
         "state_func": lambda ebb_flow: ebb_flow == TIDE_EBB,
     },
-    "flowing": {
+    "tide_flowing": {
         "type": "binary_sensor",
         "key": "ebb_flow",
         "attrs": [
@@ -100,7 +100,7 @@ ENTITIES = {
         "icon": "mdi:arrow-expand-up",
         "state_func": lambda ebb_flow: ebb_flow == TIDE_FLOW,
     },
-    "ebb_flow": {
+    "tide_ebb_flow": {
         "type": "sensor",
         "key": "ebb_flow",
         "attrs": [
@@ -113,7 +113,7 @@ ENTITIES = {
         "device_class": "ebb_flow",
         "icon": "mdi:wave",
     },
-    "next_tide": {
+    "tide_next": {
         "type": "sensor",
         "key": "next_tide.time",
         "attrs": [
@@ -127,7 +127,7 @@ ENTITIES = {
         "device_class": None,
         "icon": "mdi:wave",
     },
-    "next_tide_low": {
+    "tide_next_low": {
         "type": "sensor",
         "key": "next_tide_low.time",
         "attrs": [
@@ -139,7 +139,7 @@ ENTITIES = {
         "device_class": None,
         "icon": "mdi:wave",
     },
-    "next_tide_high": {
+    "tide_next_high": {
         "type": "sensor",
         "key": "next_tide_high.time",
         "attrs": [
@@ -151,7 +151,7 @@ ENTITIES = {
         "device_class": None,
         "icon": "mdi:waves",
     },
-    "time_to_next_tide": {
+    "tide_time_to_next": {
         "type": "sensor",
         "key": "time_to_next_tide",
         "attrs": ["next_tide_time"],
@@ -161,7 +161,7 @@ ENTITIES = {
         "icon": "mdi:wave",
         "state_func": lambda delta2next: delta2next.total_seconds() / 3600,
     },
-    "time_to_next_low": {
+    "tide_time_to_next_low": {
         "type": "sensor",
         "key": "time_to_next_low",
         "attrs": ["next_tide_low"],
@@ -171,7 +171,7 @@ ENTITIES = {
         "icon": "mdi:wave",
         "state_func": lambda delta2next: delta2next.total_seconds() / 3600,
     },
-    "time_to_next_high": {
+    "tide_time_to_next_high": {
         "type": "sensor",
         "key": "time_to_next_high",
         "attrs": ["next_tide_high"],
@@ -194,20 +194,7 @@ ENTITIES = {
         "device_class": "tide_state",
         "icon": "mdi:wave",
     },
-    # "tide_state_full": {
-    #     "type": "sensor",
-    #     "key": "tide_state_full",
-    #     "attrs": [
-    #         "next_tide_time",
-    #         # "time_to_next_high",
-    #         # "time_to_next_low"
-    #     ],
-    #     "units": None,
-    #     "convert_units_func": None,
-    #     "device_class": "tide_state_full",
-    #     "icon": "mdi:wave",
-    # },
-    "prediction": {
+    "tide_prediction": {
         "type": "sensor",
         "key": "currentdata.prediction",
         "attrs": [
@@ -221,7 +208,7 @@ ENTITIES = {
         "device_class": None,
         "icon": "mdi:wave",
     },
-    "forecast": {
+    "tide_forecast": {
         "type": "sensor",
         "key": "currentdata.forecast",
         "attrs": [
@@ -235,7 +222,7 @@ ENTITIES = {
         "device_class": None,
         "icon": "mdi:wave",
     },
-    "observation": {
+    "tide_observation": {
         "type": "sensor",
         "key": "currentobservation.observation",
         "attrs": [
@@ -249,7 +236,7 @@ ENTITIES = {
         "device_class": None,
         "icon": "mdi:wave",
     },
-    "weathereffect": {
+    "tide_weathereffect": {
         "type": "sensor",
         "key": "currentobservation.weathereffect",
         "attrs": [],

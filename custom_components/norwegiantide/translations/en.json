@@ -4,7 +4,7 @@
         "step": {
             "user": {
                 "title": "NorwegianTide",
-                "description": "If you need help with the configuration have a look here: https://github.com/custom-components/NorwegianTide",
+                "description": "If you need help with the configuration have a look here: https://github.com/tmjo/ha-norwegiantide",
                 "data": {
                     "place": "Location name",
                     "latitude": "Latitude",
@@ -16,7 +16,7 @@
             "auth": "Latitude/longitude is wrong or outside coverage."
         },
         "abort": {
-            "single_instance_allowed": "Only a single configuration of NorwegianTide is allowed."
+            "single_instance_allowed": "Only a single configuration of integration is allowed."
         }
     },
     "options": {
