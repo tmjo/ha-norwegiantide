@@ -1,15 +1,17 @@
 """Sample API Client."""
-from datetime import timedelta
-import logging
 import asyncio
+import logging
+import re
 import socket
+import xml.etree.ElementTree as ET
+from datetime import timedelta
+from decimal import Decimal
 from typing import Optional
+
 import aiohttp
 import async_timeout
-import xml.etree.ElementTree as ET
-import re
 from homeassistant.util import dt
-from decimal import Decimal
+
 from .const import TIDE_EBB, TIDE_FLOW
 
 TIMEOUT = 30  # seconds

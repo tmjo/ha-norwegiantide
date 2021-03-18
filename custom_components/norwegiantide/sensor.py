@@ -1,5 +1,6 @@
 """Sensor platform for NorwegianTide."""
 import logging
+
 from .const import DOMAIN
 from .entity import NorwegianTideEntity
 

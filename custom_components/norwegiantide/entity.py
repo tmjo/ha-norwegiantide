@@ -1,19 +1,21 @@
 """NorwegianTideEntity class"""
-from homeassistant.const import ATTR_FRIENDLY_NAME
 import logging
 from datetime import datetime, timedelta
 from typing import Callable, List
+
+from homeassistant.const import ATTR_FRIENDLY_NAME
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import dt
+
 from .const import (
+    ATTRIBUTION,
     CONF_STRINGTIME,
     DOMAIN,
     MANUFACTURER,
     NAME,
     TIDE_FLOW,
-    VERSION,
-    ATTRIBUTION,
     TIDE_STATUS,
+    VERSION,
 )
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)

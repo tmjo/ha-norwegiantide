@@ -3,21 +3,19 @@ Custom integration to integrate NorwegianTide with Home Assistant.
 
 """
 import asyncio
-from homeassistant.const import CONF_MONITORED_CONDITIONS
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_MONITORED_CONDITIONS
 from homeassistant.core import Config, HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.helpers.event import async_track_time_interval
-from .entity import convert_units_funcs
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+
 from .api import NorwegianTideApiClient
 from .binary_sensor import NorwegianTideBinarySensor
-from .switch import NorwegianTideSwitch
-from .sensor import NorwegianTideSensor
 from .const import (
     CONF_LAT,
     CONF_LONG,
@@ -27,6 +25,9 @@ from .const import (
     PLATFORMS,
     STARTUP_MESSAGE,
 )
+from .entity import convert_units_funcs
+from .sensor import NorwegianTideSensor
+from .switch import NorwegianTideSwitch
 
 API_SCAN_INTERVAL = timedelta(minutes=5)
 ENTITIES_SCAN_INTERVAL = timedelta(seconds=60)

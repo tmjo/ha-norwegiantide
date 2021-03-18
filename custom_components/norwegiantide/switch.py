@@ -1,9 +1,10 @@
 """Switch platform for NorwegianTide."""
+import logging
+
 from homeassistant.components.switch import SwitchEntity
 
 from .const import DOMAIN
 from .entity import NorwegianTideEntity
-import logging
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
 

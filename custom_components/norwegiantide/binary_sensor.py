@@ -1,12 +1,10 @@
 """Binary sensor platform for NorwegianTide."""
+import logging
+
 from homeassistant.components.binary_sensor import BinarySensorEntity
 
-from .const import (
-    BINARY_SENSOR,
-    DOMAIN,
-)
+from .const import BINARY_SENSOR, DOMAIN
 from .entity import NorwegianTideEntity
-import logging
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
 

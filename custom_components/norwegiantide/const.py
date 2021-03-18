@@ -1,9 +1,5 @@
 """Constants for NorwegianTide."""
-from homeassistant.const import (
-    DEVICE_CLASS_TIMESTAMP,
-    LENGTH_CENTIMETERS,
-    TIME_HOURS,
-)
+from homeassistant.const import DEVICE_CLASS_TIMESTAMP, LENGTH_CENTIMETERS, TIME_HOURS
 
 # Base component constants
 NAME = "Norwegian Tide"
