@@ -4,3 +4,4 @@ custom_components/__pycache__/
 *.py[cod]
 *$py.class
 *.pyc
+*.pyc

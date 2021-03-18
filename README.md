@@ -73,3 +73,4 @@ MIT © [Tor Magne Johannessen][tmjo]
 [hacs-image]: https://img.shields.io/badge/HACS-Custom-orange.svg
 [buymeacoffee-url]: https://www.buymeacoffee.com/tmjo
 [buymeacoffee-image]: https://img.shields.io/badge/support-buymeacoffee-222222.svg?style=flat-square
+[tmjo]: https://github.com/tmjo
