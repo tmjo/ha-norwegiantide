@@ -9,10 +9,10 @@ from homeassistant.const import (
 NAME = "Norwegian Tide"
 DOMAIN = "norwegiantide"
 DOMAIN_DATA = f"{DOMAIN}_data"
-VERSION = "2021.3.1"
+VERSION = "2021.3.3"
 ATTRIBUTION = "Data from ©Kartverket (www.kartverket.no)"
 MANUFACTURER = "kartverket.no"
-ISSUE_URL = "https://github.com/custom-components/NorwegianTide/issues"
+ISSUE_URL = "https://github.com/tmjo/ha-norwegiantide/issues"
 
 # Platforms
 BINARY_SENSOR = "binary_sensor"
