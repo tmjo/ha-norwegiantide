@@ -112,13 +112,9 @@ class NorwegianTideApiClient:
         self.last_data = self.getLastData()
         self.current_data = self.getCurrentData()
         self.current_observation = self.getCurrentDataObservation()
-        # self.forecast = self.getData(type=API_FORECAST)
-        # self.prediction = self.getData(type=API_PREDICTION)
-        # self.observation = self.getData(type=API_OBSERVATION)
         self.data = self.getDataAll()
 
         return {
-            # "location": self.location,
             API_PLACE: self.getLocationPlace(),
             API_LAT: self.getLocation(API_LAT),
             API_LON: self.getLocation(API_LON),
@@ -134,17 +130,12 @@ class NorwegianTideApiClient:
             "ebbing": self.ebb_flow == TIDE_EBB,
             "flowing": self.ebb_flow == TIDE_FLOW,
             "tide_state": self.tide_state_full,
-            # "tide_state": self.tide_state,
-            # "tide_state_full": self.tide_state_full,
             "highlow": self.highlow,
             "tidedatatime": self.tidedatatime,
             "tidedata": self.tidedata,
             "lastdata": self.last_data,
             "currentdata": self.current_data,
             "currentobservation": self.current_observation,
-            # "forecast": self.forecast,
-            # "prediction": self.prediction,
-            # "observation": self.observation,
             "data": self.data,
         }
 
@@ -207,18 +198,6 @@ class NorwegianTideApiClient:
         location = {}
         if locationdata is None:
             locationdata = self.locationdata
-
-        # <location name="Stavanger"
-        # code="SVG"
-        # latitude="58.974339"
-        # longitude="5.730121"
-        # delay="0"
-        # factor="1.00"
-        # obsname="Stavanger"
-        # obscode="SVG"
-        # place="Syrevågen"
-        # descr="Tidvatn og observert vasstand frå Stavanger"/>
-        # <reflevelcode>CD</reflevelcode>
 
         # Get all "deepcopy"
         for key, data in locationdata.items():
@@ -320,17 +299,6 @@ class NorwegianTideApiClient:
             datalist.append(item)
         _LOGGER.debug(f"getData_list_all: {datalist}")
         return datalist
-
-        # datadict = {}
-        # for key, data in tidedatatime.items():
-        #     datadict[key.strftime(API_STRINGTIME)] = {
-        #         "tidetime": key,
-        #         "prediction": data.get(API_PREDICTION),
-        #         "forecast": data.get(API_FORECAST),
-        #         "observation": data.get(API_OBSERVATION),
-        #     }
-        # _LOGGER.debug(f"getData_list_all: {datadict}")
-        # return datadict
 
     def getNextTide(self, highlow=None):
         """Get next change in tide."""

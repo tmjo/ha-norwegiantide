@@ -60,7 +60,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     if not coordinator.last_update_success:
         raise ConfigEntryNotReady
 
-    # hass.data[DOMAIN]["coordinator"] = coordinator
     hass.data[DOMAIN][entry.entry_id] = coordinator
     hass.data[DOMAIN]["entities"] = []
 
@@ -97,14 +96,6 @@ class NorwegianTideDataUpdateCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self):
         """Update data via library."""
         _LOGGER.debug(f"Coordinator update.")
-        # try:
-        #     data = await self.api.async_get_data()
-        #     self.update_ha_state()
-        #     return data
-        # except Exception as exception:
-        #     _LOGGER.debug(f"Exception while getting data.")
-        #     raise UpdateFailed() from exception
-
         data = await self.api.async_get_data()
         self.update_ha_state()
         return data
@@ -141,7 +132,6 @@ class NorwegianTideDataUpdateCoordinator(DataUpdateCoordinator):
         for key in monitored_conditions:
             if key not in ENTITIES:
                 continue
-            # for key in ENTITIES:
             data = ENTITIES[key]
             entity_type = data.get("type", "sensor")
 

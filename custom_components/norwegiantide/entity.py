@@ -99,7 +99,6 @@ class NorwegianTideEntity(CoordinatorEntity):
     @property
     def name(self):
         """Return the name of the entity."""
-        # return f"{DOMAIN}_{self._place}_{self._entity_name}"
         return f"{self._place}_{self._entity_name}".replace("_", " ")
 
     @property
@@ -132,21 +131,6 @@ class NorwegianTideEntity(CoordinatorEntity):
 
         try:
             attrs.update(self.coordinator.data.get("place"))
-
-            # location[ATTR_LATITUDE] = location.pop("latitude", None)
-            # location[ATTR_LONGITUDE] = location.pop("longitude", None)
-
-            # attrs["next_tide"] = (str(self.coordinator.data.get("next_tide")),)
-            # attrs["tide_state"] = (str(self.coordinator.data.get("tide_state")),)
-            # attrs["highlow"] = (str(self.coordinator.data.get("highlow")),)
-            # attrs["lastdata"] = (str(self.coordinator.data.get("lastdata")),)
-            # attrs["currentdata"] = (str(self.coordinator.data.get("currentdata")),)
-            # attrs["tidedata"] = (str(len(self.coordinator.data.get("tidedata"))),)
-            # attrs["tidedatatime"] = (
-            #     str(len(self.coordinator.data.get("tidedatatime"))),
-            # )
-            # # attrs["tide"] = (str(self.coordinator.data.get("tide")),)
-
             for attr_key in self._attrs_keys:
                 key = attr_key.replace(".", "_")
                 attrs[key] = self.get_value_from_key(attr_key)
