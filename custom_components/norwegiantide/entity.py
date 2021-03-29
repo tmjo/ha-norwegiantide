@@ -131,7 +131,7 @@ class NorwegianTideEntity(CoordinatorEntity):
         }
 
         try:
-            attrs.update(self.coordinator.data.get("location"))
+            attrs.update(self.coordinator.data.get("place"))
 
             # location[ATTR_LATITUDE] = location.pop("latitude", None)
             # location[ATTR_LONGITUDE] = location.pop("longitude", None)

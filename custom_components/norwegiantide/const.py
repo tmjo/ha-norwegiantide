@@ -51,7 +51,9 @@ ENTITIES = {
             # "time_to_next_tide",
             # "time_to_next_high",
             # "time_to_next_low"
-            "location_full",
+            CONF_LAT,
+            CONF_LONG,
+            "location_details",
             "ebb_flow",
             "ebbing",
             "flowing",

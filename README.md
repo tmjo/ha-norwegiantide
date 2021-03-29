@@ -66,7 +66,7 @@ The main sensor will keep the current forecast value as state and will contain a
 Please report issues on github. If you would like to contribute to development, please do so through PRs.
 
 ## License
-MIT © [Tor Magne Johannessen][tmjo]
+MIT © [Tor Magne Johannessen][tmjo]. **All data is ©Kartverket**.
 
 <!-- Badges -->
 [hacs-url]: https://github.com/custom-components/hacs

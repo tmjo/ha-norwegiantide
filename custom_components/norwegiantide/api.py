@@ -22,6 +22,9 @@ API_STRINGTIME = "%Y-%m-%dT%H:%M:%S.%f%z"
 API_LANG = "nb"
 API_LOW = "low"
 API_HIGH = "high"
+API_LAT = "latitude"
+API_LON = "longitude"
+API_PLACE = "place"
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
 
@@ -116,8 +119,10 @@ class NorwegianTideApiClient:
 
         return {
             # "location": self.location,
-            "location": self.getLocationData(),
-            "location_full": self.getLocationData(compact=False),
+            API_PLACE: self.getLocationPlace(),
+            API_LAT: self.getLocation(API_LAT),
+            API_LON: self.getLocation(API_LON),
+            "location_details": self.getLocationDetails(),
             "next_tide": self.next_tide,
             "next_tide_time": {self.next_tide.get("time", None)},
             "next_tide_low": self.next_tide_low,
@@ -272,11 +277,21 @@ class NorwegianTideApiClient:
                 return data
         return {}
 
-    def getLocationData(self, compact=True):
-        if not compact:
-            return self.location
-        else:
-            return {"place": self.location.get("place", None)}
+    def getLocationPlace(self):
+        return {API_PLACE: self.location.get(API_PLACE, None)}
+
+    def getLocation(self, latlon):
+        if latlon == API_LAT:
+            return self.location.get(API_LAT, None)
+        elif latlon == API_LON:
+            return self.location.get(API_LON, None)
+
+    def getLocationDetails(self):
+        details = {}
+        for k, v in self.location.items():
+            if k not in [API_PLACE, API_LON, API_LAT]:
+                details[k] = v
+        return details
 
     def getData(self, tidedatatime=None, type=API_FORECAST):
         """Get list of data [datestamp, data]. Type can be forecast, prediction or observation."""

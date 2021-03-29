@@ -1,5 +1,5 @@
 # Norwegian Tide
-
+[![Buy Me A Coffee][https://img.shields.io/badge/support-buymeacoffee-222222.svg?style=flat-square]][https://www.buymeacoffee.com/tmjo]
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs) ![Maintenance](https://img.shields.io/maintenance/yes/2021.svg)
 
 {% if pending_update %}
