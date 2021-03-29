@@ -5,7 +5,7 @@ from homeassistant.const import DEVICE_CLASS_TIMESTAMP, LENGTH_CENTIMETERS, TIME
 NAME = "Norwegian Tide"
 DOMAIN = "norwegiantide"
 DOMAIN_DATA = f"{DOMAIN}_data"
-VERSION = "2021.3.3"
+VERSION = "2021.3.4"
 ATTRIBUTION = "Data from ©Kartverket (www.kartverket.no)"
 MANUFACTURER = "kartverket.no"
 ISSUE_URL = "https://github.com/tmjo/ha-norwegiantide/issues"
