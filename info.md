@@ -22,7 +22,7 @@ You will be asked to give your location a name and to provide latitude and longi
 Entities can be added and removed by clicking *Options* in HA integreation view at any time. It is also possible to enable more than one location by adding the integration several times.
 
 ## Usage
-Use the integration as you please, but I strongly recommend to take a look at the [Apexchart-card] (https://github.com/RomRider/apexcharts-card) by Romrider - it is an excellent graph card for lovelace which also enables the possibility to show future values. This is necessary to display prediction- and forecast values which are stored as attributes in the main sensor.
+Use the integration as you please, but I strongly recommend to take a look at the [Apexchart-card](https://github.com/RomRider/apexcharts-card) by Romrider - it is an excellent graph card for lovelace which also enables the possibility to show future values. This is necessary to display prediction- and forecast values which are stored as attributes in the main sensor.
 
 More detailed description will follow, but worth mentioning:
  - Prediction: A calculated prediction for the location
