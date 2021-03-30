@@ -8,25 +8,34 @@ from datetime import timedelta
 from decimal import Decimal
 from typing import Optional
 
+import pytz
 import aiohttp
 import async_timeout
-from homeassistant.util import dt
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import numpy as np
+import datetime as dt
+import os, sys
 
-from .const import TIDE_EBB, TIDE_FLOW
-
+DEFAULT_TIME_ZONE: dt.tzinfo = pytz.timezone("Europe/Oslo")
 TIMEOUT = 30  # seconds
+API_NAME = "norwegiantide"
 API_PREDICTION = "prediction"
 API_OBSERVATION = "observation"
 API_FORECAST = "forecast"
-API_STRINGTIME = "%Y-%m-%dT%H:%M:%S.%f%z"
+API_STRINGTIME = "%Y-%m-%dT%H:%M:%S%z"
+API_EBB = "ebb"
+API_FLOW = "flow"
 API_LANG = "nb"
 API_LOW = "low"
 API_HIGH = "high"
 API_LAT = "latitude"
 API_LON = "longitude"
 API_PLACE = "place"
+CONST_DIR_DEFAULT = os.path.join(CONST_DIR_THIS, "tmp")
 
-_LOGGER: logging.Logger = logging.getLogger(__package__)
+# _LOGGER: logging.Logger = logging.getLogger(__package__)
+_LOGGER: logging.Logger = logging.getLogger(__file__)
 
 HEADERS = {"Content-type": "application/json; charset=UTF-8"}
 
@@ -58,7 +67,7 @@ class NorwegianTideApiClient:
         totime=None,
     ):
         if fromtime is None:
-            fromtime = dt.now() - timedelta(hours=12)
+            fromtime = dt_now() - timedelta(hours=12)
 
         if totime is None:
             totime = fromtime + timedelta(hours=36)
@@ -83,16 +92,16 @@ class NorwegianTideApiClient:
 
     async def get_xml_data(self):
         try:
-            # Get low/high tides table
-            response = await self.api_wrapper("get", self.get_url(datatype="tab"))
-            content = await response.text()
-            self.highlowdata = self.xml_high_low(content)
-
             # Get prediction, observation and forecast
             response = await self.api_wrapper("get", self.get_url(datatype="all"))
             content = await response.text()
             self.locationdata = self.xml_location(content)
             self.tidedata = self.xml_tidedata(content)
+
+            # Get low/high tides table
+            response = await self.api_wrapper("get", self.get_url(datatype="tab"))
+            content = await response.text()
+            self.highlowdata = self.xml_high_low(content)
         except AttributeError as exception:
             _LOGGER.debug(
                 f"Unable to decode xml possibly due to previous error getting data. {exception}"
@@ -127,8 +136,8 @@ class NorwegianTideApiClient:
             "time_to_next_low": self.time_to_next_low,
             "time_to_next_high": self.time_to_next_high,
             "ebb_flow": self.ebb_flow,
-            "ebbing": self.ebb_flow == TIDE_EBB,
-            "flowing": self.ebb_flow == TIDE_FLOW,
+            "ebbing": self.ebb_flow == API_EBB,
+            "flowing": self.ebb_flow == API_FLOW,
             "tide_state": self.tide_state_full,
             "highlow": self.highlow,
             "tidedatatime": self.tidedatatime,
@@ -190,7 +199,11 @@ class NorwegianTideApiClient:
             tidedata[datatype.attrib.get("type")] = []
             for data in datatype.iter("waterlevel"):
                 tidedata[datatype.attrib.get("type")].append(data.attrib)
-        _LOGGER.debug(f"xml_tidedata: {len(tidedata)}")
+        _LOGGER.debug(f"xml_tidedata: {len(tidedata)} datatypes")
+        for k in tidedata.keys():
+            _LOGGER.debug(
+                f"xml_tidedata - datatype: {k} {len(tidedata.get(k))} entries"
+            )
         return tidedata
 
     def process_location(self, locationdata=None):
@@ -225,7 +238,7 @@ class NorwegianTideApiClient:
         prevtime = None
         for data in highlowdata:
             if data.get("time", None) is not None:
-                data["time"] = dt.parse_datetime(data.get("time"))
+                data["time"] = dt_parse_datetime(data.get("time"))
             if prevtime is not None:
                 data["timefromlast"] = str(data["time"] - prevtime)
             prevtime = data["time"]
@@ -244,9 +257,9 @@ class NorwegianTideApiClient:
                 datadict[datatype] = self.findByTime(
                     tidedata.get(datatype), data["time"]
                 ).get("value", "NaN")
-            tidedatatime[dt.parse_datetime(data["time"])] = datadict
+            tidedatatime[dt_parse_datetime(data["time"])] = datadict
         _LOGGER.debug(f"process_tidedatatime: {len(tidedatatime)}")
-        _LOGGER.debug(f"tidedatatime: {tidedatatime}")
+        # _LOGGER.debug(f"tidedatatime: {tidedatatime}")
         return tidedatatime
 
     def findByTime(self, datatype, time):
@@ -292,65 +305,73 @@ class NorwegianTideApiClient:
         for key, data in tidedatatime.items():
             item = {
                 "datetime": key,
-                "prediction": data.get(API_PREDICTION),
-                "forecast": data.get(API_FORECAST),
-                "observation": data.get(API_OBSERVATION),
+                API_PREDICTION: data.get(API_PREDICTION),
+                API_FORECAST: data.get(API_FORECAST),
+                API_OBSERVATION: data.get(API_OBSERVATION),
             }
             datalist.append(item)
-        _LOGGER.debug(f"getData_list_all: {datalist}")
+        _LOGGER.debug(f"getData_list_all: {len(datalist)}")
         return datalist
 
     def getNextTide(self, highlow=None):
         """Get next change in tide."""
-        for tide in self.highlow:
-            if dt.now() < tide["time"]:
-                if highlow is None or tide["flag"] == highlow:
-                    _LOGGER.debug(f"getNextTide (highlow={highlow}):  - {tide}")
-                    return tide
-        return {}
+        try:
+            for tide in self.highlow:
+                if dt_now() < tide["time"]:
+                    if highlow is None or tide["flag"] == highlow:
+                        _LOGGER.debug(f"getNextTide (highlow={highlow}):  - {tide}")
+                        return tide
+        except TypeError:
+            return {}
 
     def getTimeBetweenTideTimes(self, tide1, tide2=None):
         """Get difference between two tide times."""
         if tide2 is None:
             for tide in self.highlow:
-                if dt.now() < tide.get("time"):
+                if dt_now() < tide.get("time"):
                     break
-                tide2 = dt.parse_datetime(tide.get("time", None))  # previous tide
+                tide2 = dt_parse_datetime(tide.get("time", None))  # previous tide
         return tide1 - tide2
 
     def getTimeToNextTide(self, nexttide=None, highlow=None):
         """Get time to next change of tide."""
-        if nexttide is None and highlow is None:
-            nexttide = self.next_tide
-        elif highlow is not None:
-            nexttide = self.getNextTide(highlow)
-        return nexttide.get("time") - dt.now()
+        try:
+            if nexttide is None and highlow is None:
+                nexttide = self.next_tide
+            elif highlow is not None:
+                nexttide = self.getNextTide(highlow)
+            return nexttide.get("time") - dt_now()
+        except TypeError:
+            return None
 
     def getTideState(self, nexttide=None):
         """Get state of next change in tide (low/high)."""
-        if nexttide is None:
-            nexttide = self.getNextTide()
+        try:
+            if nexttide is None:
+                nexttide = self.getNextTide()
 
-        tidedelta = nexttide.get("time") - dt.now()
-        timefromlast = self.parsetimedelta(nexttide.get("timefromlast", 0))
-        tidesplit = timefromlast / 6
+            tidedelta = nexttide.get("time") - dt_now()
+            timefromlast = parsetimedelta(nexttide.get("timefromlast", 0))
+            tidesplit = timefromlast / 6
 
-        _LOGGER.debug(f"getTideState nexttide: {nexttide}")
-        _LOGGER.debug(f"getTideState tidedelta: {tidedelta}")
+            _LOGGER.debug(f"getTideState nexttide: {nexttide}")
+            _LOGGER.debug(f"getTideState tidedelta: {tidedelta}")
 
-        # Short time to tide change
-        if tidedelta <= tidesplit:
-            if nexttide.get("flag") == API_LOW:
-                return f"{API_LOW}"
-            elif nexttide.get("flag") == API_HIGH:
-                return f"{API_HIGH}"
-        # Long time to tide change, opposite
-        elif (timefromlast - tidedelta) <= tidesplit:
-            if nexttide.get("flag") == API_LOW:
-                return f"{API_HIGH}"
-            elif nexttide.get("flag") == API_HIGH:
-                return f"{API_LOW}"
-        return "Normal"
+            # Short time to tide change
+            if tidedelta <= tidesplit:
+                if nexttide.get("flag") == API_LOW:
+                    return f"{API_LOW}"
+                elif nexttide.get("flag") == API_HIGH:
+                    return f"{API_HIGH}"
+            # Long time to tide change, opposite
+            elif (timefromlast - tidedelta) <= tidesplit:
+                if nexttide.get("flag") == API_LOW:
+                    return f"{API_HIGH}"
+                elif nexttide.get("flag") == API_HIGH:
+                    return f"{API_LOW}"
+            return "Normal"
+        except TypeError:
+            return None
 
     def getTideStateEbbFlow(self, nexttide=None):
         """Get direction of tide (ebb/flow)."""
@@ -358,22 +379,25 @@ class NorwegianTideApiClient:
             nexttide = self.getNextTide()
 
         if nexttide.get("flag") == API_LOW:
-            tidestate = TIDE_EBB  # if next tide is low, then it is ebbing
+            tidestate = API_EBB  # if next tide is low, then it is ebbing
         elif nexttide.get("flag") == API_HIGH:
-            tidestate = TIDE_FLOW  # if next tide is high, then it is flowing
+            tidestate = API_FLOW  # if next tide is high, then it is flowing
         else:
             tidestate = None
         return tidestate
 
     def getTideStateFull(self, nexttide=None):
         """Get full tide state including both high/low and ebb/flow."""
-        if nexttide is None:
-            nexttide = self.getNextTide()
-        state = self.getTideState(nexttide)
-        if state == "Normal":
-            return self.getTideStateEbbFlow(nexttide)
-        else:
-            return state + " " + self.getTideStateEbbFlow(nexttide)
+        try:
+            if nexttide is None:
+                nexttide = self.getNextTide()
+            state = self.getTideState(nexttide)
+            if state == "Normal":
+                return self.getTideStateEbbFlow(nexttide)
+            else:
+                return state + " " + self.getTideStateEbbFlow(nexttide)
+        except TypeError:
+            return None
 
     def getLastData(self, type=None):
         """Get last data in datatype."""
@@ -386,7 +410,7 @@ class NorwegianTideApiClient:
 
     def getCurrentData(self, type=None):
         """Get current data i.e. data nearest to actual time."""
-        nearest = self.getNearestData(self.tidedatatime, dt.now())
+        nearest = self.getNearestData(self.tidedatatime, dt_now())
         _LOGGER.debug(f"getCurrentData: {nearest} - {self.tidedatatime[nearest]}")
         return self.tidedatatime[nearest]
 
@@ -400,21 +424,153 @@ class NorwegianTideApiClient:
         )
         if lastobservation is not None:
             time = lastobservation.get("time", None)
-            return self.tidedatatime.get(dt.parse_datetime(time), None)
+            return self.tidedatatime.get(dt_parse_datetime(time), None)
         else:
             return None
 
     def getNearestData(self, items, data):
         """Return the datetime in items which is the closest to the data pivot, datetypes must support comparison and subtraction."""
-        return min(items, key=lambda x: abs(x - data))
+        try:
+            return min(items, key=lambda x: abs(x - data))
+        except TypeError:
+            return None
 
-    def parsetimedelta(self, s):
-        """Return a timedelta parsed from string representation."""
-        if "day" in s:
-            m = re.match(
-                r"(?P<days>[-\d]+) day[s]*, (?P<hours>\d+):(?P<minutes>\d+):(?P<seconds>\d[\.\d+]*)",
-                s,
-            )
-        else:
-            m = re.match(r"(?P<hours>\d+):(?P<minutes>\d+):(?P<seconds>\d[\.\d+]*)", s)
-        return timedelta(**{key: float(val) for key, val in m.groupdict().items()})
+    def plot_tidedata(self, filename=None, show=False):
+        x = []
+        y1 = []
+        y2 = []
+        y3 = []
+        for data in self.data:
+            x.append(data.get("datetime"))
+            y1.append(float(data.get(API_FORECAST)))
+            y2.append(float(data.get(API_PREDICTION)))
+            y3.append(float(data.get(API_OBSERVATION)))
+
+        # Min/max/now
+        ymin = min(y1 + y2 + y3)
+        ymax = max(y1 + y2 + y3)
+        print(f"MIN {ymin} and MAX {ymax}")
+        now = dt_now()
+
+        # Plot the data
+        fig, ax = plt.subplots(1)
+        plt.plot(x, y1, label=API_FORECAST, color="green", linewidth=3)
+        plt.plot(x, y2, label=API_PREDICTION, color="darkorange", linewidth=3)
+        plt.plot(x, y3, label=API_OBSERVATION, color="blue", linewidth=3)
+        plt.axvline(x=now, color="red", linestyle="dashed", linewidth=1)
+        plt.text(now, -5, f" Now {self.current_data.get(API_FORECAST)}cm", color="red")
+
+        t_high = self.next_tide_high.get("time")
+        v_high = self.next_tide_high.get("value")
+        t_low = self.next_tide_low.get("time")
+        v_low = self.next_tide_low.get("value")
+
+        print(f"high = {self.next_tide_high}")
+        print(f"low = {self.next_tide_low}")
+
+        plt.text(
+            t_high,
+            float(v_high) + 5,
+            f"{dt_strftime(t_high, '%H:%M')}\n{v_high}cm",
+            color="darkorange",
+            ha="center",
+            rotation=90,
+        )
+
+        plt.text(
+            t_low,
+            float(v_low) + 20,
+            f"{dt_strftime(t_low, '%H:%M')}\n{v_low}cm",
+            color="darkorange",
+            ha="center",
+            rotation=90,
+        )
+
+        # Formatting
+        plt.gcf().autofmt_xdate()
+        xfmt = mdates.DateFormatter("%H:%M", tz=now.tzinfo)  # %d-%m-%y %H:%M
+        xloc = mdates.MinuteLocator(interval=120)
+        ax.xaxis.set_major_formatter(xfmt)
+        ax.xaxis.set_major_locator(xloc)
+        ax.set(title="Tide " + self.place, ylabel="Waterlevel [cm]")
+        plt.xticks(rotation=90, ha="center")
+
+        # Custom scaling
+        ylim_min = ymin if ymin < -10 else -10
+        ylim_max = ymax if ymax > 140 else 140
+        ax.set_ylim([ylim_min, ylim_max])
+
+        # Add a legend
+        plt.legend()
+
+        # Save image
+        if filename is None:
+            filename = os.path.join(CONST_DIR_DEFAULT, API_NAME + ".png")
+
+        _LOGGER.debug(f"Saving image {filename}.")
+        plt.savefig("tidetest.png")
+        # newimage.save(filename, "png")
+
+        # Show if selected to do so
+        if show:
+            plt.show()
+
+
+def parsetimedelta(s):
+    """Return a timedelta parsed from string representation."""
+    if "day" in s:
+        m = re.match(
+            r"(?P<days>[-\d]+) day[s]*, (?P<hours>\d+):(?P<minutes>\d+):(?P<seconds>\d[\.\d+]*)",
+            s,
+        )
+    else:
+        m = re.match(r"(?P<hours>\d+):(?P<minutes>\d+):(?P<seconds>\d[\.\d+]*)", s)
+    return timedelta(**{key: float(val) for key, val in m.groupdict().items()})
+
+
+def dt_now(time_zone: Optional[dt.tzinfo] = None) -> dt.datetime:
+    """Get now in specified time zone."""
+    return dt.datetime.now(time_zone or DEFAULT_TIME_ZONE)
+
+
+def dt_parse_datetime(dt_str: str) -> Optional[dt.datetime]:
+    try:
+        return dt.datetime.strptime(dt_str, API_STRINGTIME)
+    except (ValueError, IndexError) as e:
+        _LOGGER.debug(f"{dt_str} - PARSE ERROR: {e}")
+
+
+def dt_strftime(dt_dt: dt.datetime, format=API_STRINGTIME) -> Optional[str]:
+    try:
+        return dt_dt.astimezone(DEFAULT_TIME_ZONE).strftime(format)
+    except ValueError as e:
+        _LOGGER.debug(f"{dt_dt} - PARSE ERROR: {e}")
+
+
+async def main():
+    session = aiohttp.ClientSession()
+    tide = NorwegianTideApiClient(
+        latitude=59.14353698387255,  # 59.14353698387255, 5.226260472137416
+        longitude=5.226260472137416,
+        place="Syre",
+        session=session,
+    )
+    tidedata = await tide.async_get_data()
+    print(tidedata.get(API_PLACE, None))
+    print(tidedata.get(API_LON, None) + " " + tidedata.get(API_LAT, None))
+    print(tidedata.get("location_details", None))
+    tide.plot_tidedata()
+    await session.close()
+
+
+if __name__ == "__main__":
+    import sys
+
+    _LOGGER.setLevel(logging.DEBUG)
+    fh = logging.StreamHandler()
+    fh_formatter = logging.Formatter(
+        "%(asctime)s %(levelname)s %(lineno)d:%(filename)s(%(process)d) - %(message)s"
+    )
+    fh.setFormatter(fh_formatter)
+    _LOGGER.addHandler(fh)
+    asyncio.run(main())

@@ -14,7 +14,8 @@ ISSUE_URL = "https://github.com/tmjo/ha-norwegiantide/issues"
 BINARY_SENSOR = "binary_sensor"
 SENSOR = "sensor"
 SWITCH = "switch"
-PLATFORMS = [BINARY_SENSOR, SENSOR, SWITCH]
+CAMERA = "camera"
+PLATFORMS = [BINARY_SENSOR, SENSOR, SWITCH, CAMERA]
 
 # Configuration and options
 CONF_ENABLED = "enabled"
@@ -239,5 +240,15 @@ ENTITIES = {
         "convert_units_func": None,
         "device_class": None,
         "icon": "mdi:wave",
+    },
+    "tide_cam": {
+        "type": "camera",
+        "key": "type",
+        "attrs": [],
+        "units": None,
+        "convert_units_func": None,
+        "device_class": None,
+        "icon": "mdi:home",
+        "state_func": None,
     },
 }
