@@ -106,7 +106,7 @@ class NorwegianTideEntity(CoordinatorEntity):
         """Return the device information."""
         return {
             "identifiers": {(DOMAIN, self._place)},
-            "name": f"{self._place}",
+            "name": f"{NAME} - {self._place}",
             "model": VERSION,
             "manufacturer": MANUFACTURER,
         }

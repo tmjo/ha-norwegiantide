@@ -7,7 +7,7 @@ DOMAIN = "norwegiantide"
 DOMAIN_DATA = f"{DOMAIN}_data"
 VERSION = "2021.3.5"
 ATTRIBUTION = "Data from ©Kartverket (www.kartverket.no)"
-MANUFACTURER = "kartverket.no"
+MANUFACTURER = f"{NAME}"
 ISSUE_URL = "https://github.com/tmjo/ha-norwegiantide/issues"
 
 # Platforms
@@ -242,7 +242,7 @@ ENTITIES = {
         "units": None,
         "convert_units_func": None,
         "device_class": None,
-        "icon": "mdi:home",
+        "icon": "mdi:chart-timeline-variant-shimmer",
         "state_func": None,
     },
 }
