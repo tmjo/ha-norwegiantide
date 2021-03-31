@@ -4,6 +4,7 @@ import logging
 import re
 import socket
 import xml.etree.ElementTree as ET
+import argparse
 from datetime import timedelta
 from decimal import Decimal
 from typing import Optional
@@ -19,6 +20,7 @@ import os, sys
 
 DEFAULT_TIME_ZONE: dt.tzinfo = pytz.timezone("Europe/Oslo")
 TIMEOUT = 30  # seconds
+API_ATTRIBUTION = "Data from ©Kartverket (www.kartverket.no)"
 API_NAME = "norwegiantide"
 API_PREDICTION = "prediction"
 API_OBSERVATION = "observation"
@@ -32,10 +34,10 @@ API_HIGH = "high"
 API_LAT = "latitude"
 API_LON = "longitude"
 API_PLACE = "place"
+CONST_DIR_THIS = os.path.split(__file__)[0]
 CONST_DIR_DEFAULT = os.path.join(CONST_DIR_THIS, "tmp")
 
-# _LOGGER: logging.Logger = logging.getLogger(__package__)
-_LOGGER: logging.Logger = logging.getLogger(__file__)
+_LOGGER: logging.Logger = logging.getLogger(__package__)
 
 HEADERS = {"Content-type": "application/json; charset=UTF-8"}
 
@@ -85,9 +87,12 @@ class NorwegianTideApiClient:
         await self.get_xml_data()
 
         # Process data
-        self.location = self.process_location()
-        self.tidedatatime = self.process_tidedatatime()
-        self.highlow = self.process_high_low()
+        try:
+            self.location = self.process_location()
+            self.tidedatatime = self.process_tidedatatime()
+            self.highlow = self.process_high_low()
+        except AttributeError as e:
+            _LOGGER.error("Unable to decode API response.")
         return self.process_data()
 
     async def get_xml_data(self):
@@ -436,6 +441,8 @@ class NorwegianTideApiClient:
             return None
 
     def plot_tidedata(self, filename=None, show=False):
+
+        _LOGGER.debug("Creating plot")
         x = []
         y1 = []
         y2 = []
@@ -449,7 +456,6 @@ class NorwegianTideApiClient:
         # Min/max/now
         ymin = min(y1 + y2 + y3)
         ymax = max(y1 + y2 + y3)
-        print(f"MIN {ymin} and MAX {ymax}")
         now = dt_now()
 
         # Plot the data
@@ -458,33 +464,15 @@ class NorwegianTideApiClient:
         plt.plot(x, y2, label=API_PREDICTION, color="darkorange", linewidth=3)
         plt.plot(x, y3, label=API_OBSERVATION, color="blue", linewidth=3)
         plt.axvline(x=now, color="red", linestyle="dashed", linewidth=1)
-        plt.text(now, -5, f" Now {self.current_data.get(API_FORECAST)}cm", color="red")
-
-        t_high = self.next_tide_high.get("time")
-        v_high = self.next_tide_high.get("value")
-        t_low = self.next_tide_low.get("time")
-        v_low = self.next_tide_low.get("value")
-
-        print(f"high = {self.next_tide_high}")
-        print(f"low = {self.next_tide_low}")
-
         plt.text(
-            t_high,
-            float(v_high) + 5,
-            f"{dt_strftime(t_high, '%H:%M')}\n{v_high}cm",
-            color="darkorange",
-            ha="center",
-            rotation=90,
+            now,
+            -5,
+            f" Now {self.current_data.get(API_FORECAST)}cm",
+            color="red",
+            fontsize=8,
         )
 
-        plt.text(
-            t_low,
-            float(v_low) + 20,
-            f"{dt_strftime(t_low, '%H:%M')}\n{v_low}cm",
-            color="darkorange",
-            ha="center",
-            rotation=90,
-        )
+        self.plot_add_highlow(plt, self.highlow, color="darkorange", fontsize=8)
 
         # Formatting
         plt.gcf().autofmt_xdate()
@@ -492,7 +480,10 @@ class NorwegianTideApiClient:
         xloc = mdates.MinuteLocator(interval=120)
         ax.xaxis.set_major_formatter(xfmt)
         ax.xaxis.set_major_locator(xloc)
-        ax.set(title="Tide " + self.place, ylabel="Waterlevel [cm]")
+        ax.set(
+            title=f"Tide for {self.place} ({self.tide_state_full}ing)",
+            ylabel="Waterlevel [cm]",
+        )
         plt.xticks(rotation=90, ha="center")
 
         # Custom scaling
@@ -501,6 +492,7 @@ class NorwegianTideApiClient:
         ax.set_ylim([ylim_min, ylim_max])
 
         # Add a legend
+        # plt.legend(bbox_to_anchor=(1, 1), loc="upper left")
         plt.legend()
 
         # Save image
@@ -508,12 +500,34 @@ class NorwegianTideApiClient:
             filename = os.path.join(CONST_DIR_DEFAULT, API_NAME + ".png")
 
         _LOGGER.debug(f"Saving image {filename}.")
-        plt.savefig("tidetest.png")
-        # newimage.save(filename, "png")
+        plt.savefig(filename)
 
-        # Show if selected to do so
+        # Show
         if show:
             plt.show()
+
+    def plot_add_highlow(self, plt, highlow=None, color="darkorange", fontsize=8):
+        if highlow is None:
+            highlow = self.highlow
+
+        for data in highlow:
+            t = data.get("time")
+            v = data.get("value")
+            f = data.get("flag")
+            if f == "high":
+                addpos = 5
+            else:
+                addpos = 20
+
+            plt.text(
+                t,
+                float(v) + addpos,
+                f"{dt_strftime(t, '%H:%M')}\n{v}cm",
+                color=color,
+                ha="center",
+                rotation=90,
+                fontsize=fontsize,
+            )
 
 
 def parsetimedelta(s):
@@ -534,6 +548,7 @@ def dt_now(time_zone: Optional[dt.tzinfo] = None) -> dt.datetime:
 
 
 def dt_parse_datetime(dt_str: str) -> Optional[dt.datetime]:
+    """Parse string into datetime with API dateformat."""
     try:
         return dt.datetime.strptime(dt_str, API_STRINGTIME)
     except (ValueError, IndexError) as e:
@@ -541,31 +556,56 @@ def dt_parse_datetime(dt_str: str) -> Optional[dt.datetime]:
 
 
 def dt_strftime(dt_dt: dt.datetime, format=API_STRINGTIME) -> Optional[str]:
+    """Parse datetime into string with API dateformat and timezone."""
     try:
         return dt_dt.astimezone(DEFAULT_TIME_ZONE).strftime(format)
     except ValueError as e:
         _LOGGER.debug(f"{dt_dt} - PARSE ERROR: {e}")
 
 
+def parse_arguments():
+    """Argument parser for running API separately."""
+    parser = argparse.ArgumentParser(description=f"{API_NAME}: {API_ATTRIBUTION}")
+    parser.add_argument(
+        "-lat", "--latitude", help="Latitude", required=True, type=float
+    )
+    parser.add_argument(
+        "-lon", "--longitude", help="Longitude", required=True, type=float
+    )
+    parser.add_argument("-p", "--place", help="Place name", required=False, type=str)
+    parser.add_argument(
+        "-s", "--show", help="Show plot", required=False, action="store_true"
+    )
+    args = parser.parse_args()
+    return args
+
+
 async def main():
+    """Main function when runing API separately."""
+    args = parse_arguments()
+    _LOGGER.debug("args: %s", args)
     session = aiohttp.ClientSession()
     tide = NorwegianTideApiClient(
-        latitude=59.14353698387255,  # 59.14353698387255, 5.226260472137416
-        longitude=5.226260472137416,
-        place="Syre",
+        latitude=args.latitude,
+        longitude=args.longitude,
+        place=args.place if args.place is not None else "MyLocation",
         session=session,
     )
     tidedata = await tide.async_get_data()
-    print(tidedata.get(API_PLACE, None))
-    print(tidedata.get(API_LON, None) + " " + tidedata.get(API_LAT, None))
+
+    print("\n\n\n******************************************")
+    print(f"Tide for {tidedata.get(tide.place, None)}")
+    print(f"Lat: {tidedata.get(API_LON, None)} Lon: {tidedata.get(API_LAT, None)}")
     print(tidedata.get("location_details", None))
-    tide.plot_tidedata()
+    print("******************************************\n\n\n")
     await session.close()
+    tide.plot_tidedata(show=args.show)
 
 
 if __name__ == "__main__":
     import sys
 
+    _LOGGER: logging.Logger = logging.getLogger(__file__)
     _LOGGER.setLevel(logging.DEBUG)
     fh = logging.StreamHandler()
     fh_formatter = logging.Formatter(

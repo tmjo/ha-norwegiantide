@@ -243,7 +243,7 @@ ENTITIES = {
     },
     "tide_cam": {
         "type": "camera",
-        "key": "type",
+        "key": "currentdata.forecast",
         "attrs": [],
         "units": None,
         "convert_units_func": None,

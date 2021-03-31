@@ -9,5 +9,5 @@
   "codeowners": [
     "@tmjo"
   ],
-  "requirements": []
+  "requirements": ["matplotlib==3.3.3"]
 }
