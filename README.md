@@ -52,7 +52,7 @@ Use the integration as you please, but I highly recommend to take a look at the 
 
 ![apexchart-card](img/norwegiantide_apexchart.png "apexchart-card")
 
-The camera entity can also be used for UI since it proves a nice plot using Matplotlib, but I personally prefer the Apexchart-card since it provides more dynamics. The camera on the other hand can be handy if you would like to send notifications with an included forecast image/plot. It will look something like this:
+The camera entity can also be used for UI since it provides a nice plot using Matplotlib, but I personally prefer the Apexchart-card since it provides more dynamics. The camera on the other hand can be handy if you would like to send notifications with an included forecast image/plot. It will look something like this:
 
 ![camera entity](img/norwegiantide_cam.png "camera")
 
