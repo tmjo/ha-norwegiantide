@@ -180,9 +180,9 @@ class NorwegianTideEntity(CoordinatorEntity):
         if type(value) is datetime:
             value = dt.as_local(value)
             # value = value.strftime(CONF_STRINGTIME)
-        # if type(value) is timedelta:
-        #     # TODO: Dirtyfix to avoid unable to serialize JSON error for timedeltas in attributes
-        #     value = str(value)
+        if type(value) is timedelta:
+            # TODO: Dirtyfix to avoid unable to serialize JSON error for timedeltas in attributes, divide on other timedelta gives float
+            value = round(value / timedelta(hours=1), 1)
         return value
 
     async def async_update(self):

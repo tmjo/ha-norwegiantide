@@ -57,8 +57,11 @@ ENTITIES = {
             "flowing",
             "tide_state",
             "next_tide",
+            "time_to_next_tide",
             "next_tide_low",
+            "time_to_next_low",
             "next_tide_high",
+            "time_to_next_high",
             "currentdata.prediction",
             "currentdata.forecast",
             "currentdata.observation",
@@ -75,8 +78,8 @@ ENTITIES = {
         "type": "binary_sensor",
         "key": "ebb_flow",
         "attrs": [
-            # "ebb_flow",
-            # "time_to_next_low",
+            "ebb_flow",
+            "time_to_next_tide",
             "next_tide_time",
         ],
         "units": None,
@@ -89,8 +92,8 @@ ENTITIES = {
         "type": "binary_sensor",
         "key": "ebb_flow",
         "attrs": [
-            # "ebb_flow",
-            # "time_to_next_high",
+            "ebb_flow",
+            "time_to_next_tide",
             "next_tide_time",
         ],
         "units": None,
@@ -102,11 +105,7 @@ ENTITIES = {
     "tide_ebb_flow": {
         "type": "sensor",
         "key": "ebb_flow",
-        "attrs": [
-            "next_tide_time",
-            # "time_to_next_low",
-            # "time_to_next_high"
-        ],
+        "attrs": ["next_tide_time", "time_to_next_tide"],
         "units": None,
         "convert_units_func": None,
         "device_class": "ebb_flow",
@@ -117,8 +116,9 @@ ENTITIES = {
         "key": "next_tide.time",
         "attrs": [
             "next_tide",
-            # "time_to_next_low",
-            # "time_to_next_high",
+            "time_to_next_tide",
+            "time_to_next_low",
+            "time_to_next_high",
             "highlow",
         ],
         "units": None,
@@ -129,10 +129,7 @@ ENTITIES = {
     "tide_next_low": {
         "type": "sensor",
         "key": "next_tide_low.time",
-        "attrs": [
-            "next_tide_low",
-            # "time_to_next_low"
-        ],
+        "attrs": ["next_tide_low", "time_to_next_low"],
         "units": None,
         "convert_units_func": "",
         "device_class": None,
@@ -141,10 +138,7 @@ ENTITIES = {
     "tide_next_high": {
         "type": "sensor",
         "key": "next_tide_high.time",
-        "attrs": [
-            "next_tide_high",
-            # "time_to_next_high"
-        ],
+        "attrs": ["next_tide_high", "time_to_next_high"],
         "units": None,
         "convert_units_func": "",
         "device_class": None,
@@ -183,11 +177,7 @@ ENTITIES = {
     "tide_state": {
         "type": "sensor",
         "key": "tide_state",
-        "attrs": [
-            "next_tide_time",
-            # "time_to_next_high",
-            # "time_to_next_low"
-        ],
+        "attrs": ["next_tide_time", "time_to_next_tide"],
         "units": None,
         "convert_units_func": None,
         "device_class": "tide_state",
@@ -197,9 +187,9 @@ ENTITIES = {
         "type": "sensor",
         "key": "currentdata.prediction",
         "attrs": [
+            "ebb_flow",
             "next_tide_time",
-            # "time_to_next_high",
-            # "time_to_next_low",
+            "time_to_next_tide",
         ],
         "units": LENGTH_CENTIMETERS,
         "convert_units_func": None,
@@ -210,9 +200,9 @@ ENTITIES = {
         "type": "sensor",
         "key": "currentdata.forecast",
         "attrs": [
+            "ebb_flow",
             "next_tide_time",
-            # "time_to_next_high",
-            # "time_to_next_low",
+            "time_to_next_tide",
         ],
         "units": LENGTH_CENTIMETERS,
         "convert_units_func": None,
@@ -223,9 +213,9 @@ ENTITIES = {
         "type": "sensor",
         "key": "currentobservation.observation",
         "attrs": [
+            "ebb_flow",
             "next_tide_time",
-            # "time_to_next_high",
-            # "time_to_next_low",
+            "time_to_next_tide",
         ],
         "units": LENGTH_CENTIMETERS,
         "convert_units_func": None,
@@ -244,7 +234,11 @@ ENTITIES = {
     "tide_cam": {
         "type": "camera",
         "key": "currentdata.forecast",
-        "attrs": [],
+        "attrs": [
+            "ebb_flow",
+            "next_tide_time",
+            "time_to_next_tide",
+        ],
         "units": None,
         "convert_units_func": None,
         "device_class": None,
