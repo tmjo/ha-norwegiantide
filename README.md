@@ -43,7 +43,7 @@ The installation is currently not included in HACS as a default repo, but can be
 ## Configuration
 Configuration is done through UI/Lovelace. In Home Assistant, click on Configuration > Integrations where you add it with the + icon.
 
-You will be asked to give your location a name and to provide latitude and longitude as geographical position for the location you want to track. Finally select which sensors you would like the integration to add. More detailed description of this will be added, but in short there is one main sensor which contains all info and for most people probably this may be sufficient. You do not need to add other entities unless you want, but several detailed entities are available if you prefer to have them as separate entities instead of attributes on the main sensor. There is also a camera entity which creates a plot of the data.
+You will be asked to give your location a name and to provide latitude and longitude as geographical position for the location you want to track. Finally select which sensors you would like the integration to add. More detailed description of this will be added, but in short there is one main sensor which contains all info and for most people probably this may be sufficient. You do not need to add other entities unless you want, but several detailed entities are available if you prefer to have them as separate entities instead of attributes on the main sensor. There is also a camera entity which creates a plot of the data by using Matplotlib.
 
 Entities can be added and removed by clicking *Options* in HA integreation view at any time. It is also possible to enable more than one location by adding the integration several times.
 
@@ -52,7 +52,7 @@ Use the integration as you please, but I highly recommend to take a look at the 
 
 ![apexchart-card](img/norwegiantide_apexchart.png "apexchart-card")
 
-The camera entity can also be used for UI, but I personally prefer the Apexchart-card since it provides more dynamics. The camera on the other hand can be handy if you would like to send notifications with an included forecast image/plot. It will look something like this:
+The camera entity can also be used for UI since it proves a nice plot using Matplotlib, but I personally prefer the Apexchart-card since it provides more dynamics. The camera on the other hand can be handy if you would like to send notifications with an included forecast image/plot. It will look something like this:
 
 ![camera entity](img/norwegiantide_cam.png "camera")
 
