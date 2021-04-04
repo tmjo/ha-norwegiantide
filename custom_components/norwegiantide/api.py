@@ -22,6 +22,8 @@ DEFAULT_TIME_ZONE: dt.tzinfo = pytz.timezone("Europe/Oslo")
 TIMEOUT = 30  # seconds
 API_ATTRIBUTION = "Data from ©Kartverket (www.kartverket.no)"
 API_NAME = "norwegiantide"
+VERSION = "2021.3.5"
+API_USER_AGENT = f"{API_NAME}/{VERSION} https://github.com/tmjo/ha-norwegiantide"
 API_PREDICTION = "prediction"
 API_OBSERVATION = "observation"
 API_FORECAST = "forecast"
@@ -98,7 +100,10 @@ class NorwegianTideApiClient:
     async def get_xml_data(self):
         try:
             # Get prediction, observation and forecast
-            response = await self.api_wrapper("get", self.get_url(datatype="all"))
+            headers = {"User-Agent": API_USER_AGENT}
+            response = await self.api_wrapper(
+                "get", self.get_url(datatype="all"), headers=headers
+            )
             content = await response.text()
             self.locationdata = self.xml_location(content)
             self.tidedata = self.xml_tidedata(content)
