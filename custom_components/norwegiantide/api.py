@@ -468,23 +468,34 @@ class NorwegianTideApiClient:
         plt.plot(x, y1, label=API_FORECAST, color="green", linewidth=3)
         plt.plot(x, y2, label=API_PREDICTION, color="darkorange", linewidth=3)
         plt.plot(x, y3, label=API_OBSERVATION, color="blue", linewidth=3)
+
+        # Line for 'now' and annotations current value and timestamp
         plt.axvline(x=now, color="red", linestyle="dashed", linewidth=1)
         plt.text(
             now,
             -5,
-            f" Now {self.current_data.get(API_FORECAST)}cm",
+            f" Forecast {self.current_data.get(API_FORECAST)}cm",
+            color="red",
+            fontsize=8,
+        )
+        plt.text(
+            now,
+            -9,
+            f" {now.strftime('%d.%m.%y %H:%M')}",
             color="red",
             fontsize=8,
         )
 
+        # Add high-low timestamps on plot
         self.plot_add_highlow(plt, self.highlow, color="darkorange", fontsize=8)
 
         # Formatting
         plt.gcf().autofmt_xdate()
-        xfmt = mdates.DateFormatter("%H:%M", tz=now.tzinfo)  # %d-%m-%y %H:%M
-        xloc = mdates.MinuteLocator(interval=120)
-        ax.xaxis.set_major_formatter(xfmt)
-        ax.xaxis.set_major_locator(xloc)
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M", tz=now.tzinfo))
+        ax.xaxis.set_major_locator(mdates.MinuteLocator(interval=120))
+        ax.xaxis.set_minor_locator(mdates.MinuteLocator(interval=60))
+        ax.tick_params(axis="x", labelsize=8)
+        ax.set_xlim(x[0] - timedelta(hours=1), x[-1] + timedelta(hours=1))
         ax.set(
             title=f"Tide for {self.place} ({self.tide_state_full}ing)",
             ylabel="Waterlevel [cm]",
