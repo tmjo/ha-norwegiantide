@@ -445,7 +445,9 @@ class NorwegianTideApiClient:
         except TypeError:
             return None
 
-    def plot_tidedata(self, filename=None, show=False):
+    def plot_tidedata(
+        self, filename=None, show=False, xlength: timedelta = timedelta(hours=36)
+    ):
 
         _LOGGER.debug("Creating plot")
         x = []
@@ -495,12 +497,14 @@ class NorwegianTideApiClient:
         ax.xaxis.set_major_locator(mdates.MinuteLocator(interval=120))
         ax.xaxis.set_minor_locator(mdates.MinuteLocator(interval=60))
         ax.tick_params(axis="x", labelsize=8)
-        ax.set_xlim(x[0] - timedelta(hours=1), x[-1] + timedelta(hours=1))
+        xstart = x[0] - timedelta(hours=1, minutes=x[0].minute)
+        ax.set_xlim(xstart, xstart + xlength)
         ax.set(
             title=f"Tide for {self.place} ({self.tide_state_full}ing)",
             ylabel="Waterlevel [cm]",
         )
         plt.xticks(rotation=90, ha="center")
+        _LOGGER.debug(f"Plotting from: {xstart} to {xstart+xlength}")
 
         # Custom scaling
         ylim_min = ymin if ymin < -10 else -10
