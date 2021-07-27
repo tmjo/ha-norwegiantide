@@ -1,7 +1,7 @@
 {
   "domain": "norwegiantide",
   "name": "Norwegian Tide",
-  "version": "2021.4.1",
+  "version": "2021.7.1",
   "documentation": "https://github.com/tmjo/ha-norwegiantide",
   "issue_tracker": "https://github.com/tmjo/ha-norwegiantide/issues",
   "dependencies": [],
@@ -9,5 +9,5 @@
   "codeowners": [
     "@tmjo"
   ],
-  "requirements": ["Pillow==8.1.0", "matplotlib==3.3.3"]
+  "requirements": ["Pillow>=8.1.0", "matplotlib>=3.3.3"]
 }
