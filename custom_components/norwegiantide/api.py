@@ -21,6 +21,7 @@ import os, sys
 DEFAULT_TIME_ZONE: dt.tzinfo = pytz.timezone("Europe/Oslo")
 TIMEOUT = 30  # seconds
 API_ATTRIBUTION = "Data from ©Kartverket (www.kartverket.no)"
+API_ATTRIBUTION_URL = "http://sehavniva.no/"
 API_NAME = "norwegiantide"
 VERSION = "2021.3.5"
 API_USER_AGENT = f"{API_NAME}/{VERSION} https://github.com/tmjo/ha-norwegiantide"
@@ -93,8 +94,11 @@ class NorwegianTideApiClient:
             self.location = self.process_location()
             self.tidedatatime = self.process_tidedatatime()
             self.highlow = self.process_high_low()
-        except AttributeError as e:
-            _LOGGER.error("Unable to decode API response.")
+        # except AttributeError as e:
+        except:
+            _LOGGER.error(
+                f"Unable to read API response - service may be down (try {API_ATTRIBUTION_URL})."
+            )
         return self.process_data()
 
     async def get_xml_data(self):
@@ -112,9 +116,10 @@ class NorwegianTideApiClient:
             response = await self.api_wrapper("get", self.get_url(datatype="tab"))
             content = await response.text()
             self.highlowdata = self.xml_high_low(content)
-        except AttributeError as exception:
+        # except AttributeError as e:
+        except Exception as e:
             _LOGGER.debug(
-                f"Unable to decode xml possibly due to previous error getting data. {exception}"
+                f"Unable to decode xml possibly due to previous error getting data. {e}"
             )
 
     def process_data(self):
@@ -139,7 +144,9 @@ class NorwegianTideApiClient:
             API_LON: self.getLocation(API_LON),
             "location_details": self.getLocationDetails(),
             "next_tide": self.next_tide,
-            "next_tide_time": {self.next_tide.get("time", None)},
+            "next_tide_time": {
+                None if self.next_tide is None else self.next_tide.get("time", None)
+            },
             "next_tide_low": self.next_tide_low,
             "next_tide_high": self.next_tide_high,
             "time_to_next_tide": self.time_to_next_tide,
@@ -307,7 +314,7 @@ class NorwegianTideApiClient:
         return datalist
 
     def getDataAll(self, tidedatatime=None):
-        """Get list of data [datestamp, data]. """
+        """Get list of data [datestamp, data]."""
         if tidedatatime is None:
             tidedatatime = self.tidedatatime
 
@@ -350,8 +357,13 @@ class NorwegianTideApiClient:
                 nexttide = self.next_tide
             elif highlow is not None:
                 nexttide = self.getNextTide(highlow)
-            return nexttide.get("time") - dt_now()
-        except TypeError:
+
+            if nexttide is not None:
+                return nexttide.get("time") - dt_now()
+            else:
+                return None
+        # except TypeError:
+        except:
             return None
 
     def getTideState(self, nexttide=None):
@@ -380,7 +392,8 @@ class NorwegianTideApiClient:
                 elif nexttide.get("flag") == API_HIGH:
                     return f"{API_LOW}"
             return "Normal"
-        except TypeError:
+        # except TypeError:
+        except:
             return None
 
     def getTideStateEbbFlow(self, nexttide=None):
@@ -388,7 +401,9 @@ class NorwegianTideApiClient:
         if nexttide is None:
             nexttide = self.getNextTide()
 
-        if nexttide.get("flag") == API_LOW:
+        if nexttide is None:
+            tidestate = None
+        elif nexttide.get("flag") == API_LOW:
             tidestate = API_EBB  # if next tide is low, then it is ebbing
         elif nexttide.get("flag") == API_HIGH:
             tidestate = API_FLOW  # if next tide is high, then it is flowing
@@ -420,19 +435,22 @@ class NorwegianTideApiClient:
 
     def getCurrentData(self, type=None):
         """Get current data i.e. data nearest to actual time."""
-        nearest = self.getNearestData(self.tidedatatime, dt_now())
-        _LOGGER.debug(f"getCurrentData: {nearest} - {self.tidedatatime[nearest]}")
-        return self.tidedatatime[nearest]
+        try:
+            nearest = self.getNearestData(self.tidedatatime, dt_now())
+            _LOGGER.debug(f"getCurrentData: {nearest} - {self.tidedatatime[nearest]}")
+            return self.tidedatatime[nearest]
+        except:
+            return None
 
     def getCurrentDataObservation(self):
         """Get current observation i.e. observation nearest to actual time."""
         lastobservation = self.getLastData(type=API_OBSERVATION).get(
             API_OBSERVATION, None
         )
-        _LOGGER.debug(
-            f"Last observation: {lastobservation} with time {lastobservation.get('time')}"
-        )
         if lastobservation is not None:
+            _LOGGER.debug(
+                f"Last observation: {lastobservation} with time {lastobservation.get('time')}"
+            )
             time = lastobservation.get("time", None)
             return self.tidedatatime.get(dt_parse_datetime(time), None)
         else:
@@ -442,7 +460,8 @@ class NorwegianTideApiClient:
         """Return the datetime in items which is the closest to the data pivot, datetypes must support comparison and subtraction."""
         try:
             return min(items, key=lambda x: abs(x - data))
-        except TypeError:
+        # except TypeError:
+        except:
             return None
 
     def plot_tidedata(

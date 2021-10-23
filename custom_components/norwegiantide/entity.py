@@ -116,10 +116,10 @@ class NorwegianTideEntity(CoordinatorEntity):
         """Return the unit of measurement of this entity, if any."""
         return self._units
 
-    # @property
-    # def available(self):
-    #     """Return True if entity is available."""
-    #     return self._state is not None
+    @property
+    def available(self):
+        """Return True if entity is available."""
+        return self._state is not None
 
     @property
     def state_attributes(self):
@@ -170,12 +170,12 @@ class NorwegianTideEntity(CoordinatorEntity):
         if isinstance(data, dict) and second is not None:
             value = data.get(second, None)
             if value is None:
-                _LOGGER.error(f"Did not find data for {first}.{second}")
+                _LOGGER.debug(f"Did not find data for {first}.{second}")
         elif data is not None:
             value = data
         else:
             value = None
-            _LOGGER.error(f"Did not find data for {first}")
+            _LOGGER.debug(f"Did not find data for {first}")
 
         if type(value) is datetime:
             value = dt.as_local(value)
@@ -191,6 +191,18 @@ class NorwegianTideEntity(CoordinatorEntity):
 
         self._state = self.get_value_from_key(self._state_key)
         if self._state_func is not None:
-            self._state = self._state_func(self.coordinator.data.get(self._state_key))
+            try:
+                self._state = self._state_func(
+                    self.coordinator.data.get(self._state_key)
+                )
+            except Exception as e:
+                _LOGGER.debug(
+                    f"Failed when trying state function {self._state_func}: {e}"
+                )
         if self._convert_units_func is not None:
-            self._state = self._convert_units_func(self._state, self._units)
+            try:
+                self._state = self._convert_units_func(self._state, self._units)
+            except Exception as e:
+                _LOGGER.debug(
+                    f"Failed when trying conversion {self._convert_units_func}: {e}"
+                )
