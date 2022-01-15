@@ -1,5 +1,6 @@
 """Camera platform for NorwegianTide."""
 
+from __future__ import annotations
 import logging
 from datetime import timedelta
 import io
@@ -80,7 +81,10 @@ class NorwegianTideCam(Camera, NorwegianTideEntity):
         # reduce...
         return 60
 
-    def camera_image(self):
+    async def async_camera_image(
+        self, width: int | None = None, height: int | None = None
+    ) -> bytes | None:
+        # def camera_image(self):
         """Load image bytes in memory"""
         # # don't use throttle because extra calls return Nones
         # if not self._loaded:
@@ -88,8 +92,12 @@ class NorwegianTideCam(Camera, NorwegianTideEntity):
         #     self.sky.load(self._tmpdir)
         #     self._loaded = True
         _LOGGER.debug("Updating camera image")
-        buf = io.BytesIO()
-        # self.sky.plot_sky(buf)
-        self.coordinator.api.plot_tidedata(buf)
-        buf.seek(0)
-        return buf.getvalue()
+        try:
+            buf = io.BytesIO()
+            # self.sky.plot_sky(buf)
+            self.coordinator.api.plot_tidedata(buf)
+            buf.seek(0)
+            return buf.getvalue()
+        except:
+            _LOGGER.warning("Could not read camera!")
+            return None
