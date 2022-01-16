@@ -7,7 +7,7 @@ from .api import CONST_DIR_DEFAULT
 NAME = "Norwegian Tide"
 DOMAIN = "norwegiantide"
 DOMAIN_DATA = f"{DOMAIN}_data"
-VERSION = "2022.01.2"
+VERSION = "2022.01.3"
 ATTRIBUTION = "Data from ©Kartverket (www.kartverket.no)"
 MANUFACTURER = f"{NAME}"
 ISSUE_URL = "https://github.com/tmjo/ha-norwegiantide/issues"
