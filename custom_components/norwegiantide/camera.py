@@ -5,6 +5,8 @@ import logging
 from datetime import timedelta
 import io
 from typing import Callable, List
+import mimetypes
+import os
 
 import voluptuous as vol
 
@@ -25,6 +27,7 @@ from .const import (
     NAME,
     VERSION,
     ATTRIBUTION,
+    CONST_DIR_DEFAULT,
 )
 
 
@@ -73,6 +76,30 @@ class NorwegianTideCam(Camera, NorwegianTideEntity):
         )
         Camera.__init__(self)
 
+        # Directories
+        # CONST_DIR_THIS = os.path.split(__file__)[0]
+        # CONST_DIR_DEFAULT = os.path.join(CONST_DIR_THIS, "tmp")
+        # file_path = os.path.join(CONST_DIR_DEFAULT, "norwegianweather.png")
+        file_path = os.path.join(CONST_DIR_DEFAULT, self.coordinator.api.file_image)
+
+        self._name = name
+        self.check_file_path_access(file_path)
+        self._file_path = file_path
+        # Set content type of local file
+        content, _ = mimetypes.guess_type(file_path)
+        if content is not None:
+            self.content_type = content
+
+    @property
+    def brand(self):
+        """Return the camera brand."""
+        return self.device_info.get("manufacturer", None)
+
+    @property
+    def model(self):
+        """Return the camera model."""
+        return self.device_info.get("model", None)
+
     @property
     def frame_interval(self):
         # this is how often the image will update in the background.
@@ -84,20 +111,42 @@ class NorwegianTideCam(Camera, NorwegianTideEntity):
     async def async_camera_image(
         self, width: int | None = None, height: int | None = None
     ) -> bytes | None:
-        # def camera_image(self):
-        """Load image bytes in memory"""
-        # # don't use throttle because extra calls return Nones
-        # if not self._loaded:
-        #     _LOGGER.debug("Loading image data")
-        #     self.sky.load(self._tmpdir)
-        #     self._loaded = True
+        # def camera_image(self) -> bytes | None:
+
+        """Return image response."""
+
         _LOGGER.debug("Updating camera image")
         try:
-            buf = io.BytesIO()
-            # self.sky.plot_sky(buf)
-            self.coordinator.api.plot_tidedata(buf)
-            buf.seek(0)
-            return buf.getvalue()
-        except:
-            _LOGGER.warning("Could not read camera!")
-            return None
+            with open(self._file_path, "rb") as file:
+                return file.read()
+        except FileNotFoundError:
+            _LOGGER.warning(
+                "Could not read camera %s image from file: %s",
+                self._name,
+                self._file_path,
+            )
+        return None
+
+    def check_file_path_access(self, file_path):
+        """Check that filepath given is readable."""
+        if not os.access(file_path, os.R_OK):
+            _LOGGER.warning(
+                "Could not read camera %s image from file: %s", self._name, file_path
+            )
+
+    def update_file_path(self, file_path):
+        """Update the file_path."""
+        self.check_file_path_access(file_path)
+        self._file_path = file_path
+        self.schedule_update_ha_state()
+
+    # @property
+    # def name(self):
+    #     """Return the name of this camera."""
+    #     # return self._name
+    #     return f"{self._place}_{self._entity_name}".replace("_", " ")
+
+    @property
+    def extra_state_attributes(self):
+        """Return the camera state attributes."""
+        return {"file_path": self._file_path}

@@ -46,7 +46,12 @@ HEADERS = {"Content-type": "application/json; charset=UTF-8"}
 
 class NorwegianTideApiClient:
     def __init__(
-        self, place, latitude, longitude, session: aiohttp.ClientSession
+        self,
+        place,
+        latitude,
+        longitude,
+        session: aiohttp.ClientSession,
+        output_dir=CONST_DIR_DEFAULT,
     ) -> None:
 
         """Sample API Client."""
@@ -60,6 +65,8 @@ class NorwegianTideApiClient:
         self.tidedata = {}
         self.tidedatatime = {}
         self.next_tide = {}
+        self.output_dir = output_dir
+        self.file_image = API_NAME + "_" + self.place + "_img.png"
 
     def get_url(
         self,
@@ -136,6 +143,11 @@ class NorwegianTideApiClient:
         self.current_data = self.getCurrentData()
         self.current_observation = self.getCurrentDataObservation()
         self.data = self.getDataAll()
+
+        try:
+            self.plot_tidedata()
+        except Exception as e:  # pylint: disable=broad-except
+            _LOGGER.warning(f"Error processing tide plot: {e}")
 
         return {
             API_PLACE: self.getLocationPlace(),
@@ -539,7 +551,7 @@ class NorwegianTideApiClient:
 
         # Save image
         if filename is None:
-            filename = os.path.join(CONST_DIR_DEFAULT, API_NAME + ".png")
+            filename = os.path.join(self.output_dir, self.file_image)
 
         _LOGGER.debug(f"Saving image {filename}.")
         plt.savefig(filename)
@@ -547,6 +559,7 @@ class NorwegianTideApiClient:
         # Show
         if show:
             plt.show()
+        plt.close()
 
     def plot_add_highlow(self, plt, highlow=None, color="darkorange", fontsize=8):
         if highlow is None:

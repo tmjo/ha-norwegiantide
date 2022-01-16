@@ -1,6 +1,8 @@
 """Constants for NorwegianTide."""
 from homeassistant.const import DEVICE_CLASS_TIMESTAMP, LENGTH_CENTIMETERS, TIME_HOURS
 
+from .api import CONST_DIR_DEFAULT
+
 # Base component constants
 NAME = "Norwegian Tide"
 DOMAIN = "norwegiantide"
