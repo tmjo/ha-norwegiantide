@@ -486,9 +486,12 @@ class NorwegianTideApiClient:
 
         # Plot the data
         fig, ax = plt.subplots(1)
-        plt.plot(x, y1, label=API_FORECAST, color="green", linewidth=3)
-        plt.plot(x, y2, label=API_PREDICTION, color="darkorange", linewidth=3)
-        plt.plot(x, y3, label=API_OBSERVATION, color="blue", linewidth=3)
+        ax.plot(x, y1, label=API_FORECAST, color="green", linewidth=3)
+        ax.legend()
+        ax.plot(x, y2, label=API_PREDICTION, color="darkorange", linewidth=3)
+        ax.legend()
+        ax.plot(x, y3, label=API_OBSERVATION, color="blue", linewidth=3)
+        ax.legend()
 
         # Line for 'now' and annotations current value and timestamp
         plt.axvline(x=now, color="red", linestyle="dashed", linewidth=1)
@@ -532,7 +535,7 @@ class NorwegianTideApiClient:
 
         # Add a legend
         # plt.legend(bbox_to_anchor=(1, 1), loc="upper left")
-        plt.legend()
+        # plt.legend()  # => removed, put on ax instead - avoid No artists with labels found to put in legend. Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
 
         # Save image
         if filename is None:
