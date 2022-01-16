@@ -11,7 +11,6 @@ from typing import Optional
 
 import pytz
 import aiohttp
-import async_timeout
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import numpy as np
@@ -170,11 +169,12 @@ class NorwegianTideApiClient:
     ):
         """Get information from the API."""
         try:
-            async with async_timeout.timeout(TIMEOUT, loop=asyncio.get_event_loop()):
-                if method == "get":
-                    response = await self._session.get(url, headers=headers)
-                    _LOGGER.debug(f"Response: {response.status} from URL: {url}")
-                    return response
+            if method == "get":
+                response = await self._session.get(
+                    url, headers=headers, timeout=aiohttp.ClientTimeout(total=TIMEOUT)
+                )
+                _LOGGER.debug(f"Response: {response.status} from URL: {url}")
+                return response
 
         except asyncio.TimeoutError as exception:
             _LOGGER.error(f"Timeout fetching information from API")
