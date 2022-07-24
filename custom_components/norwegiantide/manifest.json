@@ -9,5 +9,5 @@
   "codeowners": [
     "@tmjo"
   ],
-  "requirements": ["Pillow>=8.1.0", "matplotlib>=3.3.3"]
+  "requirements": ["Pillow>=8.1.0", "matplotlib>=3.3.3","numpy>=1.21.6"]
 }
