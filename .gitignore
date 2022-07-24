@@ -6,3 +6,4 @@ custom_components/norwegiantide/__pycache__/*.*
 *$py.class
 *.pyc
 
+custom_components/norwegiantide/tmp/norwegiantide_mylocation_img.png
