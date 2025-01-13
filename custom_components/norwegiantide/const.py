@@ -1,5 +1,23 @@
 """Constants for NorwegianTide."""
-from homeassistant.const import DEVICE_CLASS_TIMESTAMP, LENGTH_CENTIMETERS, TIME_HOURS
+# from homeassistant.const import DEVICE_CLASS_TIMESTAMP, LENGTH_CENTIMETERS, TIME_HOURS
+
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+)
+from homeassistant.const import (
+    UnitOfTime,
+    UnitOfTemperature,
+    UnitOfPressure,
+    UnitOfSpeed,
+    UnitOfLength,
+    UnitOfVolumetricFlux,
+)
+
+from homeassistant.const import (
+    PERCENTAGE,
+    DEGREE,
+    UV_INDEX,
+)
 
 from .api import CONST_DIR_DEFAULT
 
@@ -70,7 +88,7 @@ ENTITIES = {
             "currentobservation.weathereffect",
             "data",
         ],
-        "units": LENGTH_CENTIMETERS,
+        "units": UnitOfLength.CENTIMETERS,
         "convert_units_func": None,
         "device_class": None,
         "icon": "mdi:wave",
@@ -150,7 +168,7 @@ ENTITIES = {
         "type": "sensor",
         "key": "time_to_next_tide",
         "attrs": ["next_tide_time"],
-        "units": TIME_HOURS,
+        "units": UnitOfTime.HOURS,
         "convert_units_func": "round_2_dec",
         "device_class": None,
         "icon": "mdi:wave",
@@ -160,7 +178,7 @@ ENTITIES = {
         "type": "sensor",
         "key": "time_to_next_low",
         "attrs": ["next_tide_low"],
-        "units": TIME_HOURS,
+        "units": UnitOfTime.HOURS,
         "convert_units_func": "round_2_dec",
         "device_class": None,
         "icon": "mdi:wave",
@@ -170,7 +188,7 @@ ENTITIES = {
         "type": "sensor",
         "key": "time_to_next_high",
         "attrs": ["next_tide_high"],
-        "units": TIME_HOURS,
+        "units": UnitOfTime.HOURS,
         "convert_units_func": "round_2_dec",
         "device_class": None,
         "icon": "mdi:waves",
@@ -193,7 +211,7 @@ ENTITIES = {
             "next_tide_time",
             "time_to_next_tide",
         ],
-        "units": LENGTH_CENTIMETERS,
+        "units": UnitOfLength.CENTIMETERS,
         "convert_units_func": None,
         "device_class": None,
         "icon": "mdi:wave",
@@ -206,7 +224,7 @@ ENTITIES = {
             "next_tide_time",
             "time_to_next_tide",
         ],
-        "units": LENGTH_CENTIMETERS,
+        "units": UnitOfLength.CENTIMETERS,
         "convert_units_func": None,
         "device_class": None,
         "icon": "mdi:wave",
@@ -219,7 +237,7 @@ ENTITIES = {
             "next_tide_time",
             "time_to_next_tide",
         ],
-        "units": LENGTH_CENTIMETERS,
+        "units": UnitOfLength.CENTIMETERS,
         "convert_units_func": None,
         "device_class": None,
         "icon": "mdi:wave",
@@ -228,7 +246,7 @@ ENTITIES = {
         "type": "sensor",
         "key": "currentobservation.weathereffect",
         "attrs": [],
-        "units": LENGTH_CENTIMETERS,
+        "units": UnitOfLength.CENTIMETERS,
         "convert_units_func": None,
         "device_class": None,
         "icon": "mdi:wave",
