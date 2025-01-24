@@ -20,7 +20,7 @@ import os, sys
 DEFAULT_TIME_ZONE: dt.tzinfo = pytz.timezone("Europe/Oslo")
 TIMEOUT = 30  # seconds
 API_ATTRIBUTION = "Data from ©Kartverket (www.kartverket.no)"
-API_ATTRIBUTION_URL = "http://sehavniva.no/"
+API_ATTRIBUTION_URL = "http://vannstand.kartverket.no/"
 API_NAME = "norwegiantide"
 VERSION = "0.1.2"
 API_USER_AGENT = f"{API_NAME}/{VERSION} https://github.com/tmjo/ha-norwegiantide"
@@ -85,7 +85,7 @@ class NorwegianTideApiClient:
 
         fromtime = fromtime.strftime(API_STRINGTIME)
         totime = totime.strftime(API_STRINGTIME)
-        url = f"http://api.sehavniva.no/tideapi.php?lat={self.lat}&lon={self.lon}&fromtime={fromtime}&totime={totime}&datatype={datatype}&refcode={refcode}&place={self.place}&file=&lang={lang}&interval={interval}&dst=0&tzone=&tide_request=locationdata"
+        url = f"http://vannstand.kartverket.no/tideapi.php?lat={self.lat}&lon={self.lon}&fromtime={fromtime}&totime={totime}&datatype={datatype}&refcode={refcode}&place={self.place}&file=&lang={lang}&interval={interval}&dst=0&tzone=&tide_request=locationdata"
         return url
 
     async def async_get_data(self) -> dict:
