@@ -116,10 +116,10 @@ class NorwegianTideEntity(CoordinatorEntity):
         """Return the unit of measurement of this entity, if any."""
         return self._units
 
-    @property
-    def available(self):
-        """Return True if entity is available."""
-        return self._state is not None
+    # @property
+    # def available(self):
+    #     """Return True if entity is available."""
+    #     return self._state is not None
 
     @property
     def state_attributes(self):
