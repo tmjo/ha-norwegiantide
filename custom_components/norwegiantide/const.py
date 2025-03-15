@@ -3,6 +3,7 @@
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
+    SensorStateClass,
 )
 from homeassistant.const import (
     UnitOfTime,
@@ -86,11 +87,12 @@ ENTITIES = {
             "currentdata.forecast",
             "currentdata.observation",
             "currentobservation.weathereffect",
-            "data",
+            # "data",
         ],
         "units": UnitOfLength.CENTIMETERS,
         "convert_units_func": None,
         "device_class": None,
+        "state_class": SensorStateClass.MEASUREMENT,
         "icon": "mdi:wave",
         "state_func": None,
     },
@@ -210,10 +212,12 @@ ENTITIES = {
             "ebb_flow",
             "next_tide_time",
             "time_to_next_tide",
+            "prediction",
         ],
         "units": UnitOfLength.CENTIMETERS,
         "convert_units_func": None,
         "device_class": None,
+        "state_class": SensorStateClass.MEASUREMENT,
         "icon": "mdi:wave",
     },
     "tide_forecast": {
@@ -223,10 +227,12 @@ ENTITIES = {
             "ebb_flow",
             "next_tide_time",
             "time_to_next_tide",
+            "forecast",
         ],
         "units": UnitOfLength.CENTIMETERS,
         "convert_units_func": None,
         "device_class": None,
+        "state_class": SensorStateClass.MEASUREMENT,
         "icon": "mdi:wave",
     },
     "tide_observation": {
@@ -236,10 +242,12 @@ ENTITIES = {
             "ebb_flow",
             "next_tide_time",
             "time_to_next_tide",
+            "observation",
         ],
         "units": UnitOfLength.CENTIMETERS,
         "convert_units_func": None,
         "device_class": None,
+        "state_class": SensorStateClass.MEASUREMENT,
         "icon": "mdi:wave",
     },
     "tide_weathereffect": {
@@ -249,6 +257,7 @@ ENTITIES = {
         "units": UnitOfLength.CENTIMETERS,
         "convert_units_func": None,
         "device_class": None,
+        "state_class": SensorStateClass.MEASUREMENT,
         "icon": "mdi:wave",
     },
     "tide_cam": {
