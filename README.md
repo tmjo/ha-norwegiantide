@@ -3,7 +3,7 @@
 [![Buy Me A Coffee][buymeacoffee-image]][buymeacoffee-url]
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs) ![Maintenance](https://img.shields.io/maintenance/yes/2025.svg)
 
-This is a Home Assistant custom integration for Norwegian Tide which is interfacing an open API by the [Norwegian Mapping Authority (Kartverket)](https://kartverket.no/en/), more precisely [sehavniva.no](http://www.sehavniva.no/) which provides information about water levels and tidal predicitions and forecasts. **All data is copright [Norwegian Mapping Authority (Kartverket)](https://kartverket.no/en/)**.
+This is a Home Assistant custom integration for Norwegian Tide which is interfacing an open API by the [Norwegian Mapping Authority (Kartverket)](https://kartverket.no/en/), more precisely [here](https://www.kartverket.no/til-sjos/se-havniva) which provides information about water levels and tidal predicitions and forecasts. **All data is copright [Norwegian Mapping Authority (Kartverket)](https://kartverket.no/en/)**.
 
 Unfortunately the service only provides data for geographical positions in Norway - this is a limitation in the API and not in this integration.
 
@@ -37,7 +37,7 @@ Example:
 
 The camera entity can also be used for UI since it provides a nice plot using Matplotlib, but I personally prefer one of the graph cards since they provide more dynamics. The camera on the other hand can be handy if you would like to send notifications with an included forecast image/plot.
 
-If you are curious about specific details and definitions, please see [www.sehavniva.no](http://www.sehavniva.no/). A brief summary:
+If you are curious about specific details and definitions, please see [here](https://www.kartverket.no/til-sjos/se-havniva). A brief summary:
  - Prediction: A calculated prediction for the location
  - Forecast: Includes the weather effect on top of the prediction
  - Observation: The observed value on the closest station to your location
