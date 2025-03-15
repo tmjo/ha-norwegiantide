@@ -28,13 +28,14 @@ You will be asked to give your location a name and to provide latitude and longi
 Entities can be added and removed by clicking *Options* in HA integration view at any time. It is also possible to enable more than one location by adding several devices.
 
 ## Usage
-Use the integration as you please, but I highly recommend to take a look at the [Apexchart-card](https://github.com/RomRider/apexcharts-card) by Romrider or [Plotly-card](https://github.com/dbuezas/lovelace-plotly-graph-card) by dbuezas - they are both excellent graph cards for lovelace which also enables the possibility to show future values. This is necessary to display prediction- and forecast values which are stored as attributes in the main sensor. Example:
+The integration entities can be added to the UI as they are and you can track the history as for all entities in Home Assistant.
 
+Use the integration as you please, but I highly recommend to take a look at the [Apexchart-card](https://github.com/RomRider/apexcharts-card) by Romrider or [Plotly-card](https://github.com/dbuezas/lovelace-plotly-graph-card) by dbuezas - they are both excellent graph cards for lovelace which also enables the possibility to show future values. This is necessary to display prediction- and forecast values which are stored as attributes in the main sensor. Examples of how to configure the graphs are found here: [Apexchart example](lovelace/lovelace-apexchart.yaml) and [Plotly example](lovelace/lovelace-plotly.yaml).
 
+Example:
 ![example](img/norwegiantide_example.png "example")
 
-The camera entity can also be used for UI since it provides a nice plot using Matplotlib, but I personally prefer one of the graph cards since they provide more dynamics. The camera on the other hand can be handy if you would like to send notifications with an included forecast image/plot. It will look something like this:
-
+The camera entity can also be used for UI since it provides a nice plot using Matplotlib, but I personally prefer one of the graph cards since they provide more dynamics. The camera on the other hand can be handy if you would like to send notifications with an included forecast image/plot.
 
 If you are curious about specific details and definitions, please see [www.sehavniva.no](http://www.sehavniva.no/). A brief summary:
  - Prediction: A calculated prediction for the location

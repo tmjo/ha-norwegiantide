@@ -1,0 +1,23 @@
+type: custom:plotly-graph
+entities:
+  - entity: sensor.proxdev_tide_observation
+    show_value: true
+  - entity: sensor.proxdev_tide_prediction
+    show_value: true
+  - entity: sensor.proxdev_tide_forecast
+    show_value: true
+    attribute: forecast
+hours_to_show: 24
+refresh_interval: 10
+layout:
+  xaxis:
+    rangeselector:
+      "y": 1.4
+      x: 0.8
+      buttons:
+        - count: 12
+          step: hour
+        - count: 1
+          step: day
+        - count: 7
+          step: day
