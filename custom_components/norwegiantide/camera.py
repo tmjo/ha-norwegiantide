@@ -7,13 +7,14 @@ import io
 from typing import Callable, List
 import mimetypes
 import os
+import aiofiles
 
-import voluptuous as vol
+# import voluptuous as vol
 
 from homeassistant.components.camera import Camera
-from homeassistant.helpers.config_validation import PLATFORM_SCHEMA
-from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE
-import homeassistant.helpers.config_validation as cv
+# from homeassistant.helpers.config_validation import PLATFORM_SCHEMA
+# from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE
+# import homeassistant.helpers.config_validation as cv
 
 from .entity import NorwegianTideEntity
 
@@ -29,6 +30,8 @@ from .const import (
     ATTRIBUTION,
     CONST_DIR_DEFAULT,
 )
+
+SCAN_INTERVAL = timedelta(seconds=120)
 
 
 async def async_setup_entry(hass, entry, async_add_devices):
@@ -80,11 +83,13 @@ class NorwegianTideCam(Camera, NorwegianTideEntity):
         # CONST_DIR_THIS = os.path.split(__file__)[0]
         # CONST_DIR_DEFAULT = os.path.join(CONST_DIR_THIS, "tmp")
         # file_path = os.path.join(CONST_DIR_DEFAULT, "norwegianweather.png")
+        self.coordinator  = coordinator
         file_path = os.path.join(CONST_DIR_DEFAULT, self.coordinator.api.file_image)
 
         self._name = name
         self.check_file_path_access(file_path)
         self._file_path = file_path
+        self._image = None
         # Set content type of local file
         content, _ = mimetypes.guess_type(file_path)
         if content is not None:
@@ -106,26 +111,25 @@ class NorwegianTideCam(Camera, NorwegianTideEntity):
         # When the GUI panel is up, it is always updated every
         # 10 seconds, which is too much. Must figure out how to
         # reduce...
-        return 60
+        return 60.0
 
     async def async_camera_image(
         self, width: int | None = None, height: int | None = None
     ) -> bytes | None:
         # def camera_image(self) -> bytes | None:
-
         """Return image response."""
-
-        _LOGGER.debug("Updating camera image")
-        try:
-            with open(self._file_path, "rb") as file:
-                return file.read()
-        except FileNotFoundError:
-            _LOGGER.warning(
-                "Could not read camera %s image from file: %s",
-                self._name,
-                self._file_path,
-            )
-        return None
+        _LOGGER.debug("Updating camera image.")
+        # try:
+        #     with open(self._file_path, "rb") as file:
+        #         return file.read()
+        # except FileNotFoundError:
+        #     _LOGGER.warning(
+        #         "Could not read camera %s image from file: %s",
+        #         self._name,
+        #         self._file_path,
+        #     )
+        # return None
+        return self._image
 
     def check_file_path_access(self, file_path):
         """Check that filepath given is readable."""
@@ -150,3 +154,17 @@ class NorwegianTideCam(Camera, NorwegianTideEntity):
     def extra_state_attributes(self):
         """Return the camera state attributes."""
         return {"file_path": self._file_path}
+
+    async def async_update(self):
+        """ Properties should always only return information from memory and not do I/O (like network requests). Implement update() or async_update() to fetch data. """
+        _LOGGER.debug(f"Updating camera image from file {self._file_path}")
+        try:
+            async with aiofiles.open(self._file_path, "rb") as file:
+                self._image = await file.read()
+        except FileNotFoundError:
+            _LOGGER.warning(
+                "Could not read camera %s image from file: %s",
+                self._name,
+                self._file_path,
+            )
+            self._image = None

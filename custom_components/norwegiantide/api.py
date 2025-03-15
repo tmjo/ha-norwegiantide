@@ -52,6 +52,9 @@ class NorwegianTideApiClient:
         longitude,
         session: aiohttp.ClientSession,
         output_dir=CONST_DIR_DEFAULT,
+        hours_past = 12,
+        hours_future = 36,
+        interval = 10,
     ) -> None:
 
         """Sample API Client."""
@@ -59,6 +62,9 @@ class NorwegianTideApiClient:
         self.place = place
         self.lat = latitude
         self.lon = longitude
+        self.hours_past = hours_past
+        self.hours_future = hours_future
+        self.interval = interval
 
         self.highlow = []
         self.location = {}
@@ -73,15 +79,18 @@ class NorwegianTideApiClient:
         datatype="all",
         refcode="cd",
         lang=API_LANG,
-        interval=10,
+        interval=None,
         fromtime=None,
         totime=None,
     ):
         if fromtime is None:
-            fromtime = dt_now() - timedelta(hours=12)
+            fromtime = dt_now() - timedelta(hours=self.hours_past)
 
         if totime is None:
-            totime = fromtime + timedelta(hours=36)
+            totime = fromtime + timedelta(hours=self.hours_future)
+        
+        if interval is None:
+            interval = self.interval
 
         fromtime = fromtime.strftime(API_STRINGTIME)
         totime = totime.strftime(API_STRINGTIME)
@@ -105,7 +114,8 @@ class NorwegianTideApiClient:
             _LOGGER.error(
                 f"Unable to read API response - service may be down (try {API_ATTRIBUTION_URL})."
             )
-        return self.process_data()
+        data = await self.process_data()
+        return data
 
     async def get_xml_data(self):
         try:
@@ -128,7 +138,7 @@ class NorwegianTideApiClient:
                 f"Unable to decode xml possibly due to previous error getting data. {e}"
             )
 
-    def process_data(self):
+    async def process_data(self):
         # Process detail data
         self.next_tide = self.getNextTide()
         self.next_tide_low = self.getNextTide(highlow=API_LOW)
@@ -143,9 +153,15 @@ class NorwegianTideApiClient:
         self.current_data = self.getCurrentData()
         self.current_observation = self.getCurrentDataObservation()
         self.data = self.getDataAll()
+        self.forecast = self.getDataAll(tidetype=API_FORECAST)
+        self.observation = self.getDataAll(tidetype=API_OBSERVATION)
+        self.prediction = self.getDataAll(tidetype=API_PREDICTION)
 
         try:
-            self.plot_tidedata()
+            # self.plot_tidedata()
+            # When calling a blocking function in your library code (https://developers.home-assistant.io/docs/asyncio_blocking_operations/)
+            loop = asyncio.get_running_loop()
+            await loop.run_in_executor(None, self.plot_tidedata, None)
         except Exception as e:  # pylint: disable=broad-except
             _LOGGER.warning(f"Error processing tide plot: {e}")
 
@@ -174,6 +190,9 @@ class NorwegianTideApiClient:
             "currentdata": self.current_data,
             "currentobservation": self.current_observation,
             "data": self.data,
+            "forecast": self.forecast,
+            "observation": self.observation,
+            "prediction": self.prediction,
         }
 
     async def api_wrapper(
@@ -285,7 +304,8 @@ class NorwegianTideApiClient:
             for datatype in tidedata:
                 datadict[datatype] = self.findByTime(
                     tidedata.get(datatype), data["time"]
-                ).get("value", "NaN")
+                # ).get("value", "NaN")
+                ).get("value", None)
             tidedatatime[dt_parse_datetime(data["time"])] = datadict
         _LOGGER.debug(f"process_tidedatatime: {len(tidedatatime)}")
         # _LOGGER.debug(f"tidedatatime: {tidedatatime}")
@@ -325,19 +345,31 @@ class NorwegianTideApiClient:
         _LOGGER.debug(f"getData_list {type}: {datalist}")
         return datalist
 
-    def getDataAll(self, tidedatatime=None):
+    def getDataAll(self, tidedatatime=None, tidetype=None):
         """Get list of data [datestamp, data]."""
         if tidedatatime is None:
             tidedatatime = self.tidedatatime
 
         datalist = []
         for key, data in tidedatatime.items():
-            item = {
-                "datetime": key,
-                API_PREDICTION: data.get(API_PREDICTION),
-                API_FORECAST: data.get(API_FORECAST),
-                API_OBSERVATION: data.get(API_OBSERVATION),
-            }
+            # item = {
+            #     "datetime": key,
+            #     API_PREDICTION: data.get(API_PREDICTION),
+            #     API_FORECAST: data.get(API_FORECAST),
+            #     API_OBSERVATION: data.get(API_OBSERVATION),
+            # }
+            if tidetype is None: #all
+                item = {
+                    "datetime": key,
+                    API_PREDICTION: data.get(API_PREDICTION),
+                    API_FORECAST: data.get(API_FORECAST),
+                    API_OBSERVATION: data.get(API_OBSERVATION),
+                }
+            else:   #specific
+                item = {
+                    "datetime": key,
+                    tidetype: data.get(tidetype),
+                }
             datalist.append(item)
         _LOGGER.debug(f"getData_list_all: {len(datalist)}")
         return datalist
@@ -487,14 +519,33 @@ class NorwegianTideApiClient:
         y3 = []
         for data in self.data:
             x.append(data.get("datetime"))
-            y1.append(float(data.get(API_FORECAST)))
-            y2.append(float(data.get(API_PREDICTION)))
-            y3.append(float(data.get(API_OBSERVATION)))
+            # y1.append(float(data.get(API_FORECAST)))
+            # y2.append(float(data.get(API_PREDICTION)))
+            # y3.append(float(data.get(API_OBSERVATION)))
+            # try:
+            #     y1.append(float(data.get(API_FORECAST,None)))
+            # except (ValueError, TypeError):
+            #     y1.append("NaN")
+            # try:
+            #     y2.append(float(data.get(API_PREDICTION,None)))
+            # except (ValueError, TypeError):
+            #     y2.append("NaN")
+            # try:
+            #     y3.append(float(data.get(API_OBSERVATION,None)))
+            # except (ValueError, TypeError):
+            #     y3.append("NaN")      
 
-        # Min/max/now
-        ymin = min(y1 + y2 + y3)
-        ymax = max(y1 + y2 + y3)
-        now = dt_now()
+            # y1.append(float(data.get(API_FORECAST,np.nan)))
+            # y2.append(float(data.get(API_PREDICTION,np.nan)))
+            # y3.append(float(data.get(API_OBSERVATION,np.nan)))
+
+            y1_val = data.get(API_FORECAST,None)
+            y2_val = data.get(API_PREDICTION,None)
+            y3_val = data.get(API_OBSERVATION,None)
+            y1.append(float(y1_val) if y1_val is not None else np.nan)
+            y2.append(float(y2_val) if y2_val is not None else np.nan)
+            y3.append(float(y3_val) if y3_val is not None else np.nan)
+
 
         # Plot the data
         fig, ax = plt.subplots(1)
@@ -506,6 +557,7 @@ class NorwegianTideApiClient:
         ax.legend()
 
         # Line for 'now' and annotations current value and timestamp
+        now = dt_now()
         plt.axvline(x=now, color="red", linestyle="dashed", linewidth=1)
         plt.text(
             now,
@@ -541,6 +593,12 @@ class NorwegianTideApiClient:
         _LOGGER.debug(f"Plotting from: {xstart} to {xstart+xlength}")
 
         # Custom scaling
+        # ymin = min(y1 + y2 + y3)
+        # ymax = max(y1 + y2 + y3)
+        ymin = np.nanmin(y1 + y2 + y3)
+        ymax = np.nanmax(y1 + y2 + y3)
+
+
         ylim_min = ymin if ymin < -10 else -10
         ylim_max = ymax if ymax > 140 else 140
         ax.set_ylim([ylim_min, ylim_max])
